@@ -11,6 +11,6 @@ namespace Models.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<StoryTag> StoryTags { get; set; }
+        public virtual ICollection<StoryTag> StoryTags { get; set; }
     }
 }

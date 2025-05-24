@@ -12,8 +12,8 @@ namespace Models.Entities
         public int Id { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }  // e.g. EG, SA
-        public ICollection<City> Cities { get; set; }
-        public ICollection<ApplicationUser> Users { get; set; }
-        public ICollection<Masjid> Masjids { get; set; }
+        public virtual ICollection<City> Cities { get; set; }
+        public virtual ICollection<ApplicationUser> Users { get; set; }
+        public virtual ICollection<Masjid> Masjids { get; set; }
     }
 }

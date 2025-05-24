@@ -13,9 +13,9 @@ namespace Models.Entities
         public int Id { get; set; }
         public string Name { get; set; }   // Arabic, English, etc.
         public string Code { get; set; }   // ar, en, etc.
-        public ICollection<MasjidContent> MasjidContents { get; set; }
-        public ICollection<Story> Stories { get; set; }
-        public ICollection<Event> Events { get; set; }
-        public ICollection<Community> Communities { get; set; }
+        public virtual ICollection<MasjidContent> MasjidContents { get; set; }
+        public virtual ICollection<Story> Stories { get; set; }
+        public virtual ICollection<Event> Events { get; set; }
+        public virtual ICollection<Community> Communities { get; set; }
     }
 }

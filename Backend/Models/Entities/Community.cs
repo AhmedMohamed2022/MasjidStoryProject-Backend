@@ -11,14 +11,14 @@ namespace Models.Entities
     {
         public int Id { get; set; }
         public int MasjidId { get; set; }
-        public Masjid Masjid { get; set; }
+        public virtual Masjid Masjid { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public int LanguageId { get; set; }
-        public Language Language { get; set; }
+        public virtual Language Language { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
-        public int CreatedById { get; set; }
-        public ApplicationUser CreatedBy { get; set; }
-        public ICollection<CommunityMember> CommunityMembers { get; set; }
+        public string CreatedById { get; set; }
+        public virtual ApplicationUser CreatedBy { get; set; }
+        public virtual ICollection<CommunityMember> CommunityMembers { get; set; }
     }
 }

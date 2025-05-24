@@ -13,7 +13,7 @@ namespace Models.Entities
         public string Title { get; set; }
         public string Content { get; set; }
         public DateTime DatePublished { get; set; } = DateTime.UtcNow;
-        public int CreatedById { get; set; }
-        public ApplicationUser CreatedBy { get; set; }
+        public string CreatedById { get; set; }
+        public virtual ApplicationUser CreatedBy { get; set; }
     }
 }

@@ -11,9 +11,9 @@ namespace Models.Entities
     {
         public int Id { get; set; }
         public int MasjidId { get; set; }
-        public Masjid Masjid { get; set; }
+        public virtual Masjid Masjid { get; set; }
         public int LanguageId { get; set; }
-        public Language Language { get; set; }
+        public virtual Language Language { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
     }

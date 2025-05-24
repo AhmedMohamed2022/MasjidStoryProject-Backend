@@ -16,13 +16,14 @@ namespace Models.Entities
         public string ProfilePictureUrl { get; set; }
 
         // Navigation relationships
-        public ICollection<Story> Stories { get; set; }
-        public ICollection<Comment> Comments { get; set; }
-        public ICollection<Like> Likes { get; set; }
-        public ICollection<EventAttendee> EventAttendances { get; set; }
-        public ICollection<CommunityMember> CommunityMemberships { get; set; }
-        public ICollection<MasjidVisit> Visits { get; set; }
-        public ICollection<Notification> Notifications { get; set; }
-        public ICollection<Blog> BlogsCreated { get; set; }
+        public virtual ICollection<Story> Stories { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<Like> Likes { get; set; }
+        public virtual ICollection<Event> EventsCreated { get; set; }
+        public virtual ICollection<EventAttendee> EventAttendances { get; set; }
+        public virtual ICollection<CommunityMember> CommunityMemberships { get; set; }
+        public virtual ICollection<MasjidVisit> Visits { get; set; }
+        public virtual ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<Blog> BlogsCreated { get; set; }
     }
 }

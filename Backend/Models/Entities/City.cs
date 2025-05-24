@@ -13,8 +13,8 @@ namespace Models.Entities
         public int Id { get; set; }
         public string Name { get; set; }
         public int CountryId { get; set; }
-        public Country Country { get; set; }
-        public ICollection<ApplicationUser> Users { get; set; }
-        public ICollection<Masjid> Masjids { get; set; }
+        public virtual  Country Country { get; set; }
+        public virtual ICollection<ApplicationUser> Users { get; set; }
+        public virtual ICollection<Masjid> Masjids { get; set; }
     }
 }

@@ -14,13 +14,13 @@ namespace Models.Entities
         public string Description { get; set; }
         public DateTime EventDate { get; set; }
         public bool IsActive { get; set; } = true;
-        public int CreatedById { get; set; }
-        public ApplicationUser CreatedBy { get; set; }
+        public string CreatedById { get; set; }
+        public virtual ApplicationUser CreatedBy { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
         public int? LanguageId { get; set; }
-        public Language Language { get; set; }
+        public virtual Language Language { get; set; }
         public int? MasjidId { get; set; }
-        public Masjid Masjid { get; set; }
-        public ICollection<EventAttendee> EventAttendees { get; set; }
+        public virtual Masjid Masjid { get; set; }
+        public virtual ICollection<EventAttendee> EventAttendees { get; set; }
     }
 }

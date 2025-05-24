@@ -9,9 +9,9 @@ namespace Models.Entities
     public class EventAttendee
     {
         public int EventId { get; set; }
-        public Event Event { get; set; }
-        public int UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        public virtual Event Event { get; set; }
+        public string UserId { get; set; }
+        public virtual ApplicationUser User { get; set; }
         public DateTime RegistrationDate { get; set; } = DateTime.UtcNow;
     }
 

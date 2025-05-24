@@ -11,8 +11,8 @@ namespace Models.Entities
     public class Notification
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        public string UserId { get; set; }
+        public virtual ApplicationUser User { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;

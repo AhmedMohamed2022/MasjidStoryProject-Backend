@@ -10,18 +10,18 @@ namespace Models.Entities
     public class Story
     {
         public int Id { get; set; }
-        public int ApplicationUserId { get; set; }
-        public ApplicationUser ApplicationUser { get; set; }
+        public string ApplicationUserId { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
         public int MasjidId { get; set; }
-        public Masjid Masjid { get; set; }
+        public virtual Masjid Masjid { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
         public DateTime DatePublished { get; set; } = DateTime.UtcNow;
         public bool IsApproved { get; set; } = false;
         public int? LanguageId { get; set; }
-        public Language Language { get; set; }
-        public ICollection<Like> Likes { get; set; }
-        public ICollection<Comment> Comments { get; set; }
-        public ICollection<StoryTag> StoryTags { get; set; }
+        public virtual Language Language { get; set; }
+        public virtual ICollection<Like> Likes { get; set; }
+        public virtual ICollection<Comment> Comments { get; set; }
+        public virtual ICollection<StoryTag> StoryTags { get; set; }
     }
 }

@@ -11,7 +11,7 @@ namespace Models.Entities
     {
         public int Id { get; set; }
         public int MasjidId { get; set; }
-        public Masjid Masjid { get; set; }
+        public virtual Masjid Masjid { get; set; }
         public string FileUrl { get; set; }
         public string MediaType { get; set; } = "Image";
         public DateTime DateUploaded { get; set; } = DateTime.UtcNow;
