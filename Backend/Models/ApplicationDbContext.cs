@@ -38,10 +38,8 @@ namespace Models
         public DbSet<NotificationTemplate> NotificationTemplates { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-
-
-
             base.OnModelCreating(builder);
+            builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         }
     }
 }
