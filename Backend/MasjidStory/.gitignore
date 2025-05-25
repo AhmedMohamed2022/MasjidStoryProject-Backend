@@ -1,0 +1,63 @@
+# ========== Core build output ========== #
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# ========== User-specific files ========== #
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ========== ASP.NET Core specific ========== #
+*.db
+*.db-shm
+*.db-wal
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json.user
+secrets.json
+*.log
+
+# ========== Entity Framework (optional) ========== #
+**/Migrations/*Snapshot.cs
+
+# ========== Angular frontend ========== #
+ClientApp/node_modules/
+ClientApp/dist/
+ClientApp/.angular/
+ClientApp/.env
+ClientApp/.env.*.local
+ClientApp/.vscode/
+
+# ========== wwwroot output (optional if auto-generated) ========== #
+wwwroot/lib/
+wwwroot/dist/
+wwwroot/assets/
+
+# ========== Visual Studio + Rider ========== #
+.vscode/
+.idea/
+*.vs/
+*.vsconfig
+
+# ========== OS-specific garbage ========== #
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========== Publish output ========== #
+publish/
+*.publishsettings
+
+# ========== Temporary files ========== #
+.vs/  
+obj/  
+bin/
+*.user
+*.suo  
+*.db
+*secrets.json   
+# ========== Backup files ========== #
