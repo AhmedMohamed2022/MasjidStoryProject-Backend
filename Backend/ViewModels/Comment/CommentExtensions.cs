@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Models.Entities;
+
+namespace ViewModels
+{
+    public static class CommentExtensions
+    {
+        // Convert entity to view model
+        public static CommentViewModel ToViewModel(this Comment entity)
+        {
+            return new CommentViewModel
+            {
+                Id = entity.Id,
+                StoryId = entity.StoryId,
+                StoryTitle = entity.Story?.Title,
+                UserId = entity.UserId,
+                UserName = entity.Author?.UserName,
+                Content = entity.Content,
+                DatePosted = entity.DatePosted,
+                IsActive = entity.IsActive
+            };
+        }
+
+        // Convert create model to entity
+        public static Comment ToEntity(this CommentCreateViewModel model)
+        {
+            return new Comment
+            {
+                StoryId = model.StoryId,
+                UserId = model.UserId,
+                Content = model.Content,
+                DatePosted = DateTime.UtcNow,
+                IsActive = true
+            };
+        }
+
+        // Update existing entity from edit model
+        public static void UpdateEntity(this CommentEditViewModel model, Comment entity)
+        {
+            entity.Content = model.Content;
+        }
+    }
+
+}

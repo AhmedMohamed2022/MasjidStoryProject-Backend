@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ViewModels
+{
+    // ViewModels/Masjid/MasjidCreateViewModel.cs
+    public class MasjidCreateViewModel
+    {
+        [Required]
+        public string ShortName { get; set; }
+        public string Address { get; set; }
+        public string ArchStyle { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+        [Required]
+        public int CountryId { get; set; }
+        [Required]
+        public int CityId { get; set; }
+        public int? YearOfEstablishment { get; set; }
+    }
+
+}
