@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Services;
+using System.Security.Claims;
 using ViewModels;
 
 namespace MasjidStory.Controllers
@@ -34,16 +36,16 @@ namespace MasjidStory.Controllers
             return Ok(story);
         }
 
-        // POST: api/story/create
-        [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] StoryCreateViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+        //// POST: api/story/create
+        //[HttpPost("create")]
+        //public async Task<IActionResult> Create([FromBody] StoryCreateViewModel model)
+        //{
+        //    if (!ModelState.IsValid)
+        //        return BadRequest(ModelState);
 
-            await _service.AddStoryAsync(model);
-            return Ok();
-        }
+        //    await _service.AddStoryAsync(model);
+        //    return Ok();
+        //}
 
         // PUT: api/story/update/{id}
         [HttpPut("update/{id}")]
@@ -69,5 +71,20 @@ namespace MasjidStory.Controllers
 
             return NoContent();
         }
+        //[Authorize]
+        [HttpPost]
+        [Route("api/story/add")]
+        public async Task<IActionResult> AddStory([FromBody] StoryCreateViewModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            // Get user ID from identity (in real app, this must be authenticated)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            await _service.AddStoryAsync(model, userId);
+            return Ok("Story submitted and pending approval.");
+        }
+
     }
 }

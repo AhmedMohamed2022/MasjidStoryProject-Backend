@@ -8,6 +8,7 @@ using ViewModels;
 using Models.Entities;
 using System.Linq.Expressions;
 using Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repositories.Implementations
 {
@@ -15,10 +16,11 @@ namespace Repositories.Implementations
     public class MasjidRepository : IMasjidRepository
     {
         private readonly IBaseRepository<Masjid> _baseRepo;
-
-        public MasjidRepository(IBaseRepository<Masjid> baseRepo)
+        private readonly ApplicationDbContext _context;
+        public MasjidRepository(IBaseRepository<Masjid> baseRepo, ApplicationDbContext context)
         {
             _baseRepo = baseRepo;
+            _context = context;
         }
 
         public async Task<List<MasjidViewModel>> GetAllAsync()
@@ -93,6 +95,46 @@ namespace Repositories.Implementations
             await _baseRepo.SaveChangesAsync();
             return true;
         }
+        //public async Task<MasjidDetailsViewModel?> GetMasjidDetailsAsync(int id, string? languageCode = null)
+        //{
+        //    var masjid = await _baseRepo.GetFirstOrDefaultAsync(
+        //        m => m.Id == id,
+        //        m => m.Country,
+        //        m => m.City,
+        //        m => m.Contents,
+        //        m => m.MediaItems,
+        //        m => m.Stories,
+        //        m => m.Stories.Select(s => s.ApplicationUser),
+        //        m => m.Stories.Select(s => s.Likes),
+        //        m => m.Stories.Select(s => s.Comments),
+        //        m => m.Visits,
+        //        m => m.Events
+        //    );
+
+        //    return masjid?.ToDetailsViewModel(languageCode);
+        //}
+        public async Task<MasjidDetailsViewModel?> GetMasjidDetailsAsync(int id, string? languageCode = null)
+        {
+            var masjid = await _context.Masjids
+                .Where(m => m.Id == id)
+                .Include(m => m.Country)
+                .Include(m => m.City)
+                .Include(m => m.Contents)
+                .Include(m => m.MediaItems)
+                .Include(m => m.Visits)
+                .Include(m => m.Events)
+                .Include(m => m.Stories)
+                    .ThenInclude(s => s.ApplicationUser)
+                .Include(m => m.Stories)
+                    .ThenInclude(s => s.Likes)
+                .Include(m => m.Stories)
+                    .ThenInclude(s => s.Comments)
+                .FirstOrDefaultAsync();
+
+            return masjid?.ToDetailsViewModel(languageCode);
+        }
+
+
     }
 
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,15 +26,17 @@ namespace ViewModels
             };
         }
 
-        public static Models.Entities.Story ToEntity(this StoryCreateViewModel vm)
+        public static Story ToEntity(this StoryCreateViewModel model, string userId)
         {
-            return new Models.Entities.Story
+            return new Story
             {
-                Title = vm.Title,
-                Content = vm.Content,
-                MasjidId = vm.MasjidId,
-                ApplicationUserId = vm.ApplicationUserId,
-                LanguageId = vm.LanguageId
+                Title = model.Title,
+                Content = model.Content,
+                MasjidId = model.MasjidId,
+                LanguageId = model.LanguageId,
+                ApplicationUserId = userId,
+                DatePublished = DateTime.UtcNow,
+                IsApproved = false // pending approval
             };
         }
 

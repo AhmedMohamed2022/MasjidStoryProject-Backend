@@ -55,6 +55,41 @@ namespace ViewModels
             entity.CityId = vm.CityId;
             entity.YearOfEstablishment = vm.YearOfEstablishment;
         }
+        public static MasjidDetailsViewModel ToDetailsViewModel(this Masjid masjid, string? languageCode = null)
+        {
+            var content = masjid.Contents.FirstOrDefault(c => c.Language.Code == languageCode)
+                          ?? masjid.Contents.FirstOrDefault();
+
+            return new MasjidDetailsViewModel
+            {
+                Id = masjid.Id,
+                ShortName = masjid.ShortName,
+                Address = masjid.Address,
+                ArchStyle = masjid.ArchStyle,
+                Latitude = masjid.Latitude,
+                Longitude = masjid.Longitude,
+                YearOfEstablishment = masjid.YearOfEstablishment,
+                CountryName = masjid.Country?.Name,
+                CityName = masjid.City?.Name,
+                LocalizedName = content?.Name ?? masjid.ShortName,
+                LocalizedDescription = content?.Description ?? "",
+                MediaUrls = masjid.MediaItems?.Select(m => m.FileUrl).ToList() ?? new(),
+                Stories = masjid.Stories
+                    .Where(s => s.IsApproved)
+                    .Select(s => new StorySummaryViewModel
+                    {
+                        Id = s.Id,
+                        Title = s.Title,
+                        AuthorName = $"{s.ApplicationUser.FirstName} {s.ApplicationUser.LastName}",
+                        DatePublished = s.DatePublished,
+                        LikeCount = s.Likes?.Count ?? 0,
+                        CommentCount = s.Comments?.Count ?? 0
+                    }).ToList(),
+                TotalVisits = masjid.Visits?.Count ?? 0,
+                UpcomingEventCount = masjid.Events?.Count(e => e.EventDate > DateTime.UtcNow) ?? 0
+            };
+        }
+
     }
 
 }

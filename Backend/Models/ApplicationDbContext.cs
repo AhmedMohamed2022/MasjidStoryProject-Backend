@@ -4,6 +4,7 @@ using Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,6 +41,9 @@ namespace Models
         {
             base.OnModelCreating(builder);
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+            builder.Entity<Country>().HasData(new Country { Id = 1, Name = "Egypt", Code = "EG" }, new Country { Id = 2, Name = "Iraq", Code = "IR" });
+            builder.Entity<City>().HasData(new City { Id = 1, Name = "Cairo", CountryId = 1 }, new City { Id = 2, Name = "Bagdad", CountryId = 2 });
+
         }
     }
 }

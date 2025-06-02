@@ -13,7 +13,7 @@ namespace Models.Entities
         // First and last names for profile
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string ProfilePictureUrl { get; set; }
+        public string ProfilePictureUrl { get; set; } = null!;
 
         // Navigation relationships
         public virtual ICollection<Story> Stories { get; set; }

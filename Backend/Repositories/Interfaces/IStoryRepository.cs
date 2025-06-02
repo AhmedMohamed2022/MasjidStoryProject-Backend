@@ -12,8 +12,10 @@ namespace Repositories.Interfaces
         Task<List<StoryViewModel>> GetAllAsync();
         Task<StoryViewModel?> GetByIdAsync(int id);
         Task<StoryEditViewModel?> GetEditByIdAsync(int id);
-        Task AddAsync(StoryCreateViewModel model);
+        //Task AddAsync(StoryCreateViewModel model);
         Task<bool> UpdateAsync(StoryEditViewModel model);
         Task<bool> DeleteAsync(int id);
+        Task AddStoryAsync(StoryCreateViewModel model, string userId);
+
     }
 }

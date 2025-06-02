@@ -15,6 +15,7 @@ namespace Repositories.Interfaces
         Task AddAsync(MasjidCreateViewModel model);
         Task<bool> UpdateAsync(MasjidEditViewModel model);
         Task<bool> DeleteAsync(int id);
+        Task<MasjidDetailsViewModel?> GetMasjidDetailsAsync(int id, string? languageCode = null);
     }
 
 }

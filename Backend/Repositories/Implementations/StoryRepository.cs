@@ -49,12 +49,12 @@ namespace Repositories.Implementations
             return story?.ToEditViewModel();
         }
 
-        public async Task AddAsync(StoryCreateViewModel model)
-        {
-            var entity = model.ToEntity();
-            await _baseRepo.AddAsync(entity);
-            await _baseRepo.SaveChangesAsync();
-        }
+        //public async Task AddAsync(StoryCreateViewModel model)
+        //{
+        //    var entity = model.ToEntity();
+        //    await _baseRepo.AddAsync(entity);
+        //    await _baseRepo.SaveChangesAsync();
+        //}
 
         public async Task<bool> UpdateAsync(StoryEditViewModel model)
         {
@@ -77,5 +77,12 @@ namespace Repositories.Implementations
             await _baseRepo.SaveChangesAsync();
             return true;
         }
+        public async Task AddStoryAsync(StoryCreateViewModel model, string userId)
+        {
+            var entity = model.ToEntity(userId);
+            await _baseRepo.AddAsync(entity);
+            await _baseRepo.SaveChangesAsync();
+        }
+
     }
 }

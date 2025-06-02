@@ -27,10 +27,10 @@ namespace Services
             return await _repository.GetByIdAsync(id);
         }
 
-        public async Task AddStoryAsync(StoryCreateViewModel model)
-        {
-            await _repository.AddAsync(model);
-        }
+        //public async Task AddStoryAsync(StoryCreateViewModel model)
+        //{
+        //    await _repository.AddAsync(model);
+        //}
 
         public async Task<bool> UpdateStoryAsync(StoryEditViewModel model)
         {
@@ -41,5 +41,10 @@ namespace Services
         {
             return await _repository.DeleteAsync(id);
         }
+        public async Task AddStoryAsync(StoryCreateViewModel model, string userId)
+        {
+            await _repository.AddStoryAsync(model, userId);
+        }
+
     }
 }

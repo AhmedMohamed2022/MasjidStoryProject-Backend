@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Models.Entities;
 using Repositories;
 using Repositories.Implementations;
 using Repositories.Interfaces;
@@ -12,10 +13,11 @@ namespace Services
     public class MasjidService
     {
         private readonly IMasjidRepository _repository;
-
-        public MasjidService(IMasjidRepository repository)
+        private readonly IMasjidVisitRepository _masjidVisitRepository;
+        public MasjidService(IMasjidRepository repository,IMasjidVisitRepository masjidVisitRepository)
         {
             _repository = repository;
+            _masjidVisitRepository = masjidVisitRepository;
         }
 
         public async Task<List<MasjidViewModel>> GetAllMasjidsAsync()
@@ -46,6 +48,27 @@ namespace Services
         {
             return await _repository.DeleteAsync(id);
         }
+        public async Task<MasjidDetailsViewModel?> GetMasjidDetailsAsync(int id, string? lang = null)
+        {
+            return await _repository.GetMasjidDetailsAsync(id, lang);
+        }
+        public async Task<bool> RegisterVisitAsync(int masjidId, string userId)
+        {
+            var masjid = await _repository.GetByIdAsync(masjidId);
+            if (masjid == null) return false;
+
+            var visit = new MasjidVisit
+            {
+                MasjidId = masjidId,
+                UserId = userId,
+                VisitDate = DateTime.UtcNow
+            };
+
+            await _masjidVisitRepository.AddAsync(visit.ToCreateViewModel());
+            return true;
+        }
+
+
     }
 
 }

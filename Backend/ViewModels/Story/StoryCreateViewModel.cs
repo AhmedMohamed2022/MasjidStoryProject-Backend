@@ -18,9 +18,9 @@ namespace ViewModels
         [Required]
         public int MasjidId { get; set; }
 
-        [Required]
-        public string ApplicationUserId { get; set; }
-
         public int? LanguageId { get; set; }
+
+        public List<string>? Tags { get; set; }
     }
+
 }

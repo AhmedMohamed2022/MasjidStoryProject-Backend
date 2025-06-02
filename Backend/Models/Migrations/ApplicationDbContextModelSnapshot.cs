@@ -299,6 +299,20 @@ namespace Models.Migrations
                     b.HasIndex("CountryId");
 
                     b.ToTable("Cities", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CountryId = 1,
+                            Name = "Cairo"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CountryId = 2,
+                            Name = "Bagdad"
+                        });
                 });
 
             modelBuilder.Entity("Models.Entities.Comment", b =>
@@ -429,6 +443,20 @@ namespace Models.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Countries", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "EG",
+                            Name = "Egypt"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "IR",
+                            Name = "Iraq"
+                        });
                 });
 
             modelBuilder.Entity("Models.Entities.Event", b =>
