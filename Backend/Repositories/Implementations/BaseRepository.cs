@@ -72,6 +72,18 @@ namespace Repositories.Implementations
         {
             return await _dbSet.Where(predicate).ToListAsync();
         }
+        public async Task<IEnumerable<T>> FindAsync(
+    Expression<Func<T, bool>> predicate,
+    params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet;
+
+            foreach (var include in includes)
+                query = query.Include(include);
+
+            return await query.Where(predicate).ToListAsync();
+        }
+
 
         public async Task AddAsync(T entity)
         {

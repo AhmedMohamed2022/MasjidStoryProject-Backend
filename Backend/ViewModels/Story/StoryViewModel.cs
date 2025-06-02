@@ -13,10 +13,15 @@ namespace ViewModels
         public string Content { get; set; }
         public DateTime DatePublished { get; set; }
         public bool IsApproved { get; set; }
+
         public string MasjidName { get; set; }
         public string AuthorFullName { get; set; }
         public string LanguageCode { get; set; }
+
         public int LikeCount { get; set; }
-        public int CommentCount { get; set; }
+        public bool IsLikedByCurrentUser { get; set; }
+
+        public List<CommentViewModel> Comments { get; set; }
     }
+
 }

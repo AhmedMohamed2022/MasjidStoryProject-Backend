@@ -71,9 +71,9 @@ namespace MasjidStory.Controllers
 
             return NoContent();
         }
-        //[Authorize]
+        [Authorize]
         [HttpPost]
-        [Route("api/story/add")]
+        [Route("add")]
         public async Task<IActionResult> AddStory([FromBody] StoryCreateViewModel model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -85,6 +85,26 @@ namespace MasjidStory.Controllers
             await _service.AddStoryAsync(model, userId);
             return Ok("Story submitted and pending approval.");
         }
+        // GET: api/story/pending
+        [HttpGet("pending")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<StoryViewModel>>> GetPendingApproval()
+        {
+            var stories = await _service.GetPendingStoriesAsync();
+            return Ok(stories);
+        }
+
+        // PUT: api/story/approve/{id}
+        [HttpPut("approve/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ApproveStory(int id)
+        {
+            var result = await _service.ApproveStoryAsync(id);
+            if (!result) return NotFound();
+
+            return Ok("Story approved successfully.");
+        }
+
 
     }
 }

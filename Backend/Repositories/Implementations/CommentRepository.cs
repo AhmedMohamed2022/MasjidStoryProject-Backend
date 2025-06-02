@@ -57,9 +57,9 @@ namespace Repositories.Implementations
         /// <summary>
         /// Adds a new comment to the database.
         /// </summary>
-        public async Task AddAsync(CommentCreateViewModel model)
+        public async Task AddAsync(CommentCreateViewModel model, string userId)
         {
-            var entity = model.ToEntity();
+            var entity = model.ToEntity(userId);
             await _baseRepo.AddAsync(entity);
             await _baseRepo.SaveChangesAsync();
         }
@@ -90,5 +90,15 @@ namespace Repositories.Implementations
             await _baseRepo.SaveChangesAsync();
             return true;
         }
+        public async Task<List<CommentViewModel>> GetByStoryIdAsync(int storyId)
+        {
+            var comments = await _baseRepo.FindAsync(
+                c => c.StoryId == storyId && c.IsActive,
+                c => c.Author
+            );
+
+            return comments.Select(c => c.ToViewModel()).ToList();
+        }
+
     }
 }

@@ -39,8 +39,8 @@ namespace MasjidStory
             builder.Services.AddScoped<MasjidService>();
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<StoryService>();
+            builder.Services.AddScoped<MediaService>();
 
-            //authentication 
             // Authentication
             builder.Services.AddAuthentication(options =>
             {
@@ -203,7 +203,7 @@ namespace MasjidStory
             }
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.UseStaticFiles();  // enables access to /uploads/image.jpg
 
             app.MapControllers();
 

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Services;
+using System.Security.Claims;
 using ViewModels;
 
 namespace MasjidStory.Controllers
@@ -32,13 +34,26 @@ namespace MasjidStory.Controllers
             return Ok(comment);
         }
 
-        // POST: api/Comment/create
-        [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] CommentCreateViewModel model)
+        // POST: api/comment/add
+        [HttpPost("add")]
+        [Authorize]
+        public async Task<IActionResult> Add([FromBody] CommentCreateViewModel model)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _service.AddCommentAsync(model);
-            return Ok();
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            await _service.AddCommentAsync(model, userId);
+            return Ok("Comment added successfully.");
+        }
+
+        // GET: api/comment/story/{storyId}
+        [HttpGet("story/{storyId}")]
+        public async Task<ActionResult<List<CommentViewModel>>> GetByStory(int storyId)
+        {
+            var comments = await _service.GetCommentsByStoryAsync(storyId);
+            return Ok(comments);
         }
 
         // PUT: api/Comment/{id}

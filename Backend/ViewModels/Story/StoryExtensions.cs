@@ -9,7 +9,7 @@ namespace ViewModels
 {
     public static class StoryExtensions
     {
-        public static StoryViewModel ToViewModel(this Models.Entities.Story entity)
+        public static StoryViewModel ToViewModel(this Story entity, string? currentUserId = null)
         {
             return new StoryViewModel
             {
@@ -22,9 +22,15 @@ namespace ViewModels
                 AuthorFullName = $"{entity.ApplicationUser?.FirstName} {entity.ApplicationUser?.LastName}",
                 LanguageCode = entity.Language?.Code ?? "en",
                 LikeCount = entity.Likes?.Count ?? 0,
-                CommentCount = entity.Comments?.Count ?? 0
+                IsLikedByCurrentUser = currentUserId != null && entity.Likes?.Any(l => l.UserId == currentUserId) == true,
+                Comments = entity.Comments?
+                    .Where(c => c.IsActive)
+                    .OrderByDescending(c => c.DatePosted)
+                    .Select(c => c.ToViewModel())
+                    .ToList() ?? new()
             };
         }
+
 
         public static Story ToEntity(this StoryCreateViewModel model, string userId)
         {

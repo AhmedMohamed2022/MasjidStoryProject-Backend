@@ -10,41 +10,27 @@ namespace Services
     /// </summary>
     public class CommentService
     {
-        private readonly ICommentRepository _commentRepo;
+        private readonly ICommentRepository _repo;
 
-        public CommentService(ICommentRepository commentRepo)
+        public CommentService(ICommentRepository repo)
         {
-            _commentRepo = commentRepo;
+            _repo = repo;
         }
 
-        // Get all comments (used typically by admin or moderation panel)
-        public async Task<List<CommentViewModel>> GetAllCommentsAsync()
+        public async Task AddCommentAsync(CommentCreateViewModel model, string userId)
         {
-            return await _commentRepo.GetAllAsync();
+            await _repo.AddAsync(model, userId);
         }
 
-        // Get a single comment by ID
-        public async Task<CommentViewModel?> GetCommentByIdAsync(int id)
+        public async Task<List<CommentViewModel>> GetCommentsByStoryAsync(int storyId)
         {
-            return await _commentRepo.GetByIdAsync(id);
+            return await _repo.GetByStoryIdAsync(storyId);
         }
 
-        // Add a new comment
-        public async Task AddCommentAsync(CommentCreateViewModel model)
-        {
-            await _commentRepo.AddAsync(model);
-        }
-
-        // Update an existing comment
-        public async Task<bool> UpdateCommentAsync(CommentEditViewModel model)
-        {
-            return await _commentRepo.UpdateAsync(model);
-        }
-
-        // Delete a comment by ID
-        public async Task<bool> DeleteCommentAsync(int id)
-        {
-            return await _commentRepo.DeleteAsync(id);
-        }
+        public async Task<List<CommentViewModel>> GetAllCommentsAsync() => await _repo.GetAllAsync();
+        public async Task<CommentViewModel?> GetCommentByIdAsync(int id) => await _repo.GetByIdAsync(id);
+        public async Task<bool> UpdateCommentAsync(CommentEditViewModel model) => await _repo.UpdateAsync(model);
+        public async Task<bool> DeleteCommentAsync(int id) => await _repo.DeleteAsync(id);
     }
+
 }

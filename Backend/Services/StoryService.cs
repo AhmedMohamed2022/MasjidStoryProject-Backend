@@ -45,6 +45,15 @@ namespace Services
         {
             await _repository.AddStoryAsync(model, userId);
         }
+        public async Task<List<StoryViewModel>> GetPendingStoriesAsync()
+        {
+            return await _repository.GetPendingAsync();
+        }
+
+        public async Task<bool> ApproveStoryAsync(int id)
+        {
+            return await _repository.ApproveAsync(id);
+        }
 
     }
 }

@@ -83,6 +83,29 @@ namespace Repositories.Implementations
             await _baseRepo.AddAsync(entity);
             await _baseRepo.SaveChangesAsync();
         }
+        public async Task<List<StoryViewModel>> GetPendingAsync()
+        {
+            var stories = await _baseRepo.FindAsync(
+                s => !s.IsApproved,
+                s => s.ApplicationUser,
+                s => s.Masjid,
+                s => s.Language
+            );
+
+            return stories.Select(s => s.ToViewModel()).ToList();
+        }
+
+        public async Task<bool> ApproveAsync(int id)
+        {
+            var story = await _baseRepo.GetByIdAsync(id);
+            if (story == null) return false;
+
+            story.IsApproved = true;
+            _baseRepo.Update(story);
+            await _baseRepo.SaveChangesAsync();
+            return true;
+        }
+
 
     }
 }

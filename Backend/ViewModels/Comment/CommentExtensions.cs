@@ -26,17 +26,18 @@ namespace ViewModels
         }
 
         // Convert create model to entity
-        public static Comment ToEntity(this CommentCreateViewModel model)
+        public static Comment ToEntity(this CommentCreateViewModel model, string userId)
         {
             return new Comment
             {
                 StoryId = model.StoryId,
-                UserId = model.UserId,
                 Content = model.Content,
+                UserId = userId,
                 DatePosted = DateTime.UtcNow,
                 IsActive = true
             };
         }
+
 
         // Update existing entity from edit model
         public static void UpdateEntity(this CommentEditViewModel model, Comment entity)

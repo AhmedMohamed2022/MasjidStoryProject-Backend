@@ -13,12 +13,13 @@ namespace Repositories.Interfaces
     /// </summary>
     public interface ICommentRepository
     {
-        Task<List<CommentViewModel>> GetAllAsync();
-        Task<CommentViewModel?> GetByIdAsync(int id);
-        Task<CommentEditViewModel?> GetEditByIdAsync(int id);
-        Task AddAsync(CommentCreateViewModel model);
-        Task<bool> UpdateAsync(CommentEditViewModel model);
-        Task<bool> DeleteAsync(int id);
+            Task AddAsync(CommentCreateViewModel model, string userId);
+            Task<List<CommentViewModel>> GetByStoryIdAsync(int storyId);
+            Task<List<CommentViewModel>> GetAllAsync(); // keep for admin if needed
+            Task<CommentViewModel?> GetByIdAsync(int id);
+            Task<bool> UpdateAsync(CommentEditViewModel model);
+            Task<bool> DeleteAsync(int id);
+
     }
 
 }
