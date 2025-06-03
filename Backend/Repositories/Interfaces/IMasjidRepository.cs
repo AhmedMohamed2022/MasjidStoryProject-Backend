@@ -1,4 +1,5 @@
 ﻿using Models.Entities;
+using System.Linq.Expressions;
 using ViewModels;
 namespace Repositories.Interfaces
 {
@@ -9,6 +10,7 @@ namespace Repositories.Interfaces
     public interface IMasjidRepository
     {
         Task<List<MasjidViewModel>> GetAllAsync();
+        Task<List<Masjid>> GetAllAsync(params Expression<Func<Masjid, object>>[] includes);
         Task<List<MasjidViewModel>> GetFilteredAsync(string? search, int pageNumber, int pageSize);
         Task<MasjidViewModel?> GetByIdAsync(int id);
         Task<MasjidEditViewModel?> GetEditByIdAsync(int id);

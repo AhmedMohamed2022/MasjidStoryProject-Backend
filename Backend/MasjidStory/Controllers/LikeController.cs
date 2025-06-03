@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Services;
+using System.Security.Claims;
 using ViewModels;
 
 namespace MasjidStory.Controllers
@@ -15,47 +17,18 @@ namespace MasjidStory.Controllers
             _likeService = likeService;
         }
 
-        /// <summary>
-        /// Gets all likes
-        /// </summary>
-        [HttpGet("getAll")]
-        public async Task<ActionResult<List<LikeViewModel>>> GetAll()
+        [HttpPost("toggle")]
+        [Authorize]
+        public async Task<IActionResult> ToggleLike([FromBody] LikeCreateViewModel model)
         {
-            var likes = await _likeService.GetAllLikesAsync();
-            return Ok(likes);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+            var liked = await _likeService.ToggleLikeAsync(model.StoryId, userId);
+            return Ok(new { success = true, liked });
         }
 
-        /// <summary>
-        /// Gets a like by ID
-        /// </summary>
-        [HttpGet("{id}")]
-        public async Task<ActionResult<LikeViewModel>> GetById(int id)
-        {
-            var like = await _likeService.GetLikeByIdAsync(id);
-            if (like == null) return NotFound();
-            return Ok(like);
-        }
-
-        /// <summary>
-        /// Creates a new like
-        /// </summary>
-        [HttpPost("create")]
-        public async Task<IActionResult> Create([FromBody] LikeCreateViewModel model)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            await _likeService.AddLikeAsync(model);
-            return Ok();
-        }
-
-        /// <summary>
-        /// Deletes a like by ID
-        /// </summary>
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var result = await _likeService.DeleteLikeAsync(id);
-            if (!result) return NotFound();
-            return NoContent();
-        }
     }
 }

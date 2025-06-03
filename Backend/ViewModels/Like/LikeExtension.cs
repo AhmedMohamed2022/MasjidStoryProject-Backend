@@ -32,7 +32,6 @@ namespace ViewModels
             return new Like
             {
                 StoryId = model.StoryId,
-                UserId = model.UserId,
                 DateLiked = DateTime.UtcNow
             };
         }

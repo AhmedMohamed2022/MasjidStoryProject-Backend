@@ -14,10 +14,11 @@ namespace Repositories.Interfaces
     /// </summary>
     public interface ILikeRepository
     {
-        Task<List<LikeViewModel>> GetAllAsync();
-        Task<LikeViewModel?> GetByIdAsync(int id);
-        Task AddAsync(LikeCreateViewModel model);
-        Task<bool> DeleteAsync(int id);
+        //Task<List<LikeViewModel>> GetAllAsync();
+        //Task<LikeViewModel?> GetByIdAsync(int id);
+        //Task AddAsync(LikeCreateViewModel model);
+        //Task<bool> DeleteAsync(int id);
+        Task<bool> ToggleLikeAsync(int storyId, string userId);
     }
 }
 

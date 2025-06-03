@@ -28,6 +28,11 @@ namespace Repositories.Implementations
             var list = await _baseRepo.GetAllAsync(m => m.Country, m => m.City);
             return list.Select(m => m.ToViewModel()).ToList();
         }
+        public async Task<List<Masjid>> GetAllAsync(params Expression<Func<Masjid, object>>[] includes)
+        {
+            return await _baseRepo.GetAllAsync(includes);
+        }
+
 
         public async Task<List<MasjidViewModel>> GetFilteredAsync(string? search, int pageNumber, int pageSize)
         {
@@ -95,24 +100,7 @@ namespace Repositories.Implementations
             await _baseRepo.SaveChangesAsync();
             return true;
         }
-        //public async Task<MasjidDetailsViewModel?> GetMasjidDetailsAsync(int id, string? languageCode = null)
-        //{
-        //    var masjid = await _baseRepo.GetFirstOrDefaultAsync(
-        //        m => m.Id == id,
-        //        m => m.Country,
-        //        m => m.City,
-        //        m => m.Contents,
-        //        m => m.MediaItems,
-        //        m => m.Stories,
-        //        m => m.Stories.Select(s => s.ApplicationUser),
-        //        m => m.Stories.Select(s => s.Likes),
-        //        m => m.Stories.Select(s => s.Comments),
-        //        m => m.Visits,
-        //        m => m.Events
-        //    );
-
-        //    return masjid?.ToDetailsViewModel(languageCode);
-        //}
+  
         public async Task<MasjidDetailsViewModel?> GetMasjidDetailsAsync(int id, string? languageCode = null)
         {
             var masjid = await _context.Masjids

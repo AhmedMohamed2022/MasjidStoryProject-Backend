@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services;
 using ViewModels;
-using Services;
 namespace MasjidStory.Controllers
 {
     [ApiController]

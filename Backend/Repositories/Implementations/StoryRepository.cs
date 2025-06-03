@@ -30,17 +30,19 @@ namespace Repositories.Implementations
 
             return stories.Select(s => s.ToViewModel()).ToList();
         }
-
-        public async Task<StoryViewModel?> GetByIdAsync(int id)
+        public async Task<StoryViewModel?> GetByIdAsync(int id, string? currentUserId = null)
         {
             var story = await _baseRepo.GetFirstOrDefaultAsync(
                 s => s.Id == id,
                 s => s.ApplicationUser,
                 s => s.Masjid,
-                s => s.Language
+                s => s.Language,
+                s => s.Likes,
+                s => s.Comments,
+                s => s.Comments.Select(c => c.Author)
             );
 
-            return story?.ToViewModel();
+            return story?.ToViewModel(currentUserId);
         }
 
         public async Task<StoryEditViewModel?> GetEditByIdAsync(int id)
@@ -104,6 +106,21 @@ namespace Repositories.Implementations
             _baseRepo.Update(story);
             await _baseRepo.SaveChangesAsync();
             return true;
+        }
+        public async Task<List<StoryViewModel>> GetLatestApprovedStoriesAsync(int count)
+        {
+            var stories = await _baseRepo.GetAllAsync(
+                s => s.ApplicationUser,
+                s => s.Masjid,
+                s => s.Language
+            );
+
+            return stories
+                .Where(s => s.IsApproved)
+                .OrderByDescending(s => s.DatePublished)
+                .Take(count)
+                .Select(s => s.ToViewModel())
+                .ToList();
         }
 
 

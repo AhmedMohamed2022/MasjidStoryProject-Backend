@@ -545,6 +545,20 @@ namespace Models.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Languages", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "en",
+                            Name = "English"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "ar",
+                            Name = "Arabic"
+                        });
                 });
 
             modelBuilder.Entity("Models.Entities.Like", b =>

@@ -67,6 +67,21 @@ namespace Services
             await _masjidVisitRepository.AddAsync(visit.ToCreateViewModel());
             return true;
         }
+        public async Task<List<MasjidViewModel>> GetFeaturedMasjidsAsync()
+        {
+            var masjids = await _repository.GetAllAsync(
+                m => m.Visits, m => m.Stories, m => m.Country, m => m.City
+            );
+
+            var featured = masjids
+                .OrderByDescending(m => m.Visits?.Count ?? 0)
+                .ThenByDescending(m => m.Stories?.Count ?? 0)
+                .Take(6)
+                .Select(m => m.ToViewModel())
+                .ToList();
+
+            return featured;
+        }
 
 
     }

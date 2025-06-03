@@ -25,27 +25,20 @@ namespace MasjidStory.Controllers
             return Ok(stories);
         }
 
-        // GET: api/story/details/{id}
+        // GET: api/story/details/{id
         [HttpGet("details/{id}")]
         public async Task<ActionResult<StoryViewModel>> GetById(int id)
         {
-            var story = await _service.GetStoryByIdAsync(id);
+            string? userId = User.Identity?.IsAuthenticated == true
+                ? User.FindFirstValue(ClaimTypes.NameIdentifier)
+                : null;
+
+            var story = await _service.GetStoryByIdAsync(id, userId);
             if (story == null)
                 return NotFound();
 
             return Ok(story);
         }
-
-        //// POST: api/story/create
-        //[HttpPost("create")]
-        //public async Task<IActionResult> Create([FromBody] StoryCreateViewModel model)
-        //{
-        //    if (!ModelState.IsValid)
-        //        return BadRequest(ModelState);
-
-        //    await _service.AddStoryAsync(model);
-        //    return Ok();
-        //}
 
         // PUT: api/story/update/{id}
         [HttpPut("update/{id}")]
@@ -103,6 +96,12 @@ namespace MasjidStory.Controllers
             if (!result) return NotFound();
 
             return Ok("Story approved successfully.");
+        }
+        [HttpGet("latest")]
+        public async Task<ActionResult<List<StoryViewModel>>> GetLatestStories()
+        {
+            var stories = await _service.GetLatestStoriesAsync();
+            return Ok(ApiResponse<List<StoryViewModel>>.Ok(stories));
         }
 
 

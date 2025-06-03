@@ -40,7 +40,7 @@ namespace MasjidStory
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<StoryService>();
             builder.Services.AddScoped<MediaService>();
-
+            builder.Services.AddScoped<EventService>();
             // Authentication
             builder.Services.AddAuthentication(options =>
             {
@@ -74,13 +74,14 @@ namespace MasjidStory
 
 
             //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowAllOrigins",
-            //        builder => builder.AllowAnyOrigin()
-            //                          .AllowAnyMethod()
-            //                          .AllowAnyHeader());
-            //});
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngularDev",
+                    policy => policy.WithOrigins("http://localhost:4200")
+                                    .AllowAnyMethod()
+                                    .AllowAnyHeader()
+                                    .AllowCredentials());
+            });
             //builder.Services.AddAuthentication(options =>
             //{
             //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -201,10 +202,10 @@ namespace MasjidStory
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            app.UseCors("AllowAngularDev");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseStaticFiles();  // enables access to /uploads/image.jpg
-
             app.MapControllers();
 
             app.Run();

@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    public class ApplicationDbContext:IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -43,6 +43,7 @@ namespace Models
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
             builder.Entity<Country>().HasData(new Country { Id = 1, Name = "Egypt", Code = "EG" }, new Country { Id = 2, Name = "Iraq", Code = "IR" });
             builder.Entity<City>().HasData(new City { Id = 1, Name = "Cairo", CountryId = 1 }, new City { Id = 2, Name = "Bagdad", CountryId = 2 });
+            builder.Entity<Language>().HasData(new Language { Id = 1, Name = "English", Code = "en" },new Language { Id = 2, Name = "Arabic", Code = "ar" });
 
         }
     }

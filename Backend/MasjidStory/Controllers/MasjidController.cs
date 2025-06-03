@@ -83,6 +83,13 @@ namespace MasjidStory.Controllers
 
             return Ok(ApiResponse<string>.Ok("Visit recorded."));
         }
+        [HttpGet("featured")]
+        public async Task<ActionResult<List<MasjidViewModel>>> GetFeaturedMasjids()
+        {
+            var masjids = await _service.GetFeaturedMasjidsAsync();
+            return Ok(ApiResponse<List<MasjidViewModel>>.Ok(masjids));
+        }
+
 
 
     }

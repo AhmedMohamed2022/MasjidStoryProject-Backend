@@ -18,33 +18,38 @@ namespace Services
         /// <summary>
         /// Returns all likes
         /// </summary>
-        public async Task<List<LikeViewModel>> GetAllLikesAsync()
+        //public async Task<List<LikeViewModel>> GetAllLikesAsync()
+        //{
+        //    return await _likeRepository.GetAllAsync();
+        //}
+
+        ///// <summary>
+        ///// Returns a like by its ID
+        ///// </summary>
+        //public async Task<LikeViewModel?> GetLikeByIdAsync(int id)
+        //{
+        //    return await _likeRepository.GetByIdAsync(id);
+        //}
+
+        ///// <summary>
+        ///// Creates a new like
+        ///// </summary>
+        //public async Task AddLikeAsync(LikeCreateViewModel model)
+        //{
+        //    await _likeRepository.AddAsync(model);
+        //}
+
+        ///// <summary>
+        ///// Deletes a like by ID
+        ///// </summary>
+        //public async Task<bool> DeleteLikeAsync(int id)
+        //{
+        //    return await _likeRepository.DeleteAsync(id);
+        //}
+        public async Task<bool> ToggleLikeAsync(int storyId, string userId)
         {
-            return await _likeRepository.GetAllAsync();
+            return await _likeRepository.ToggleLikeAsync(storyId, userId);
         }
 
-        /// <summary>
-        /// Returns a like by its ID
-        /// </summary>
-        public async Task<LikeViewModel?> GetLikeByIdAsync(int id)
-        {
-            return await _likeRepository.GetByIdAsync(id);
-        }
-
-        /// <summary>
-        /// Creates a new like
-        /// </summary>
-        public async Task AddLikeAsync(LikeCreateViewModel model)
-        {
-            await _likeRepository.AddAsync(model);
-        }
-
-        /// <summary>
-        /// Deletes a like by ID
-        /// </summary>
-        public async Task<bool> DeleteLikeAsync(int id)
-        {
-            return await _likeRepository.DeleteAsync(id);
-        }
     }
 }

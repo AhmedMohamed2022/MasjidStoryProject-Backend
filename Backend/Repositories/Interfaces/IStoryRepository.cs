@@ -10,7 +10,7 @@ namespace Repositories.Interfaces
     public interface IStoryRepository
     {
         Task<List<StoryViewModel>> GetAllAsync();
-        Task<StoryViewModel?> GetByIdAsync(int id);
+        Task<StoryViewModel?> GetByIdAsync(int id, string? currentUserId = null);
         Task<StoryEditViewModel?> GetEditByIdAsync(int id);
         //Task AddAsync(StoryCreateViewModel model);
         Task<bool> UpdateAsync(StoryEditViewModel model);
@@ -18,5 +18,7 @@ namespace Repositories.Interfaces
         Task AddStoryAsync(StoryCreateViewModel model, string userId);
         Task<List<StoryViewModel>> GetPendingAsync();
         Task<bool> ApproveAsync(int id);
+        Task<List<StoryViewModel>> GetLatestApprovedStoriesAsync(int count);
+
     }
 }

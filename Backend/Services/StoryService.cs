@@ -22,9 +22,9 @@ namespace Services
             return await _repository.GetAllAsync();
         }
 
-        public async Task<StoryViewModel> GetStoryByIdAsync(int id)
+        public async Task<StoryViewModel?> GetStoryByIdAsync(int id, string? userId = null)
         {
-            return await _repository.GetByIdAsync(id);
+            return await _repository.GetByIdAsync(id, userId);
         }
 
         //public async Task AddStoryAsync(StoryCreateViewModel model)
@@ -53,6 +53,11 @@ namespace Services
         public async Task<bool> ApproveStoryAsync(int id)
         {
             return await _repository.ApproveAsync(id);
+        }
+        public async Task<List<StoryViewModel>> GetLatestStoriesAsync()
+        {
+            var stories = await _repository.GetLatestApprovedStoriesAsync(6);
+            return stories;
         }
 
     }

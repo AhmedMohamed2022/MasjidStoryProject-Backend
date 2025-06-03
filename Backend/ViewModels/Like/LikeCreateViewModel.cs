@@ -12,8 +12,5 @@ namespace ViewModels
     {
         [Required]
         public int StoryId { get; set; }
-
-        [Required]
-        public string UserId { get; set; }
     }
 }
