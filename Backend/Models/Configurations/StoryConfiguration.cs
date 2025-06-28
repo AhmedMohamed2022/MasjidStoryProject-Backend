@@ -37,12 +37,13 @@ namespace Models.Configurations
 
             builder.HasOne(s => s.Masjid)
                 .WithMany(m=>m.Stories)
-                .HasForeignKey(s => s.MasjidId);
-
+                .HasForeignKey(s => s.MasjidId)
+                .OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(s => s.Language)
                 .WithMany(m=>m.Stories)
                 .HasForeignKey(s => s.LanguageId)
                 .OnDelete(DeleteBehavior.Restrict);
+            
         }
     }
 

@@ -11,10 +11,29 @@ namespace Services
     public class StoryService
     {
         private readonly IStoryRepository _repository;
+        private readonly MediaService _mediaService;
 
-        public StoryService(IStoryRepository repository)
+        public StoryService(IStoryRepository repository, MediaService mediaService)
         {
             _repository = repository;
+            _mediaService = mediaService;
+        }
+
+        public async Task AddStoryAsync(StoryCreateViewModel model, string userId)
+        {
+            var imageUrls = new List<string>();
+
+            if (model.StoryImages != null)
+            {
+                foreach (var image in model.StoryImages)
+                {
+                    var url = await _mediaService.UploadToPathAsync(image, "story");
+                    if (url != null)
+                        imageUrls.Add(url);
+                }
+            }
+
+            await _repository.AddStoryAsync(model, userId, imageUrls);
         }
 
         public async Task<List<StoryViewModel>> GetAllStoriesAsync()
@@ -41,10 +60,7 @@ namespace Services
         {
             return await _repository.DeleteAsync(id);
         }
-        public async Task AddStoryAsync(StoryCreateViewModel model, string userId)
-        {
-            await _repository.AddStoryAsync(model, userId);
-        }
+        
         public async Task<List<StoryViewModel>> GetPendingStoriesAsync()
         {
             return await _repository.GetPendingAsync();
@@ -59,6 +75,11 @@ namespace Services
             var stories = await _repository.GetLatestApprovedStoriesAsync(6);
             return stories;
         }
+        public async Task<List<StoryViewModel>> GetRelatedStoriesAsync(int storyId)
+        {
+            return await _repository.GetRelatedStoriesAsync(storyId);
+        }
+
 
     }
 }

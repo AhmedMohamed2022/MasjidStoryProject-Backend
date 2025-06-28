@@ -13,6 +13,10 @@ namespace ViewModels
         public string Description { get; set; }
         public DateTime EventDate { get; set; }
         public string MasjidName { get; set; }
+        public int? MasjidId { get; set; }
+        public string CreatedByName { get; set; }
+        public bool IsUserRegistered { get; set; } // optional for frontend toggle
     }
+
 
 }

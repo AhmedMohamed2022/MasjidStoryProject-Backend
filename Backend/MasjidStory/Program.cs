@@ -34,13 +34,21 @@ namespace MasjidStory
             builder.Services.AddScoped(typeof(IMasjidRepository), typeof(MasjidRepository));
             builder.Services.AddScoped(typeof(IMasjidVisitRepository), typeof(MasjidVisitRepository));
             builder.Services.AddScoped(typeof(IStoryRepository), typeof(StoryRepository));
-            
+            builder.Services.AddScoped(typeof(ILikeRepository), typeof(LikeRepository));
+            builder.Services.AddScoped(typeof(ICommentRepository), typeof(CommentRepository));
+            builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+
             //Service Registeration
-            builder.Services.AddScoped<MasjidService>();
             builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<MasjidService>();
             builder.Services.AddScoped<StoryService>();
             builder.Services.AddScoped<MediaService>();
             builder.Services.AddScoped<EventService>();
+            builder.Services.AddScoped<LikeService>();
+            builder.Services.AddScoped<CommentService>();
+            builder.Services.AddScoped<LanguageService>();
+            builder.Services.AddScoped<CommunityService>();
+            builder.Services.AddScoped<UserService>();
             // Authentication
             builder.Services.AddAuthentication(options =>
             {
@@ -194,6 +202,34 @@ namespace MasjidStory
                     {
                         Console.WriteLine($"❌ Failed to create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
                     }
+                }
+                // Seed Tags
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                if (!dbContext.Tags.Any())
+                {
+                    var defaultTags = new List<Tag>
+                    {
+                        new Tag { Name = "History" },
+                        new Tag { Name = "Architecture" },
+                        new Tag { Name = "Community" },
+                        new Tag { Name = "Charity" },
+                        new Tag { Name = "Education" },
+                        new Tag { Name = "Event" },
+                        new Tag { Name = "Prayer" },
+                        new Tag { Name = "Youth" },
+                        new Tag { Name = "Women" },
+                        new Tag { Name = "Ramadan" },
+                        new Tag { Name = "Lecture" },
+                        new Tag { Name = "Fundraising" }
+                        // Add more as needed
+                    };
+                    dbContext.Tags.AddRange(defaultTags);
+                    dbContext.SaveChanges();
+                    Console.WriteLine("✔ Default tags seeded.");
+                }
+                else
+                {
+                    Console.WriteLine("ℹ Tags already exist, skipping tag seeding.");
                 }
             }
             // Configure the HTTP request pipeline.

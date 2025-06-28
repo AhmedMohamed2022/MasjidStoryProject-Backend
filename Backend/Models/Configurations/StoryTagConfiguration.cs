@@ -19,11 +19,13 @@ namespace Models.Configurations
 
             builder.HasOne(st => st.Story)
                 .WithMany(s => s.StoryTags)
-                .HasForeignKey(st => st.StoryId);
+                .HasForeignKey(st => st.StoryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(st => st.Tag)
                 .WithMany(t => t.StoryTags)
-                .HasForeignKey(st => st.TagId);
+                .HasForeignKey(st => st.TagId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 

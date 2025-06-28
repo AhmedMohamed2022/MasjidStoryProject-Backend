@@ -23,5 +23,6 @@ namespace Models.Entities
         public virtual ICollection<Like> Likes { get; set; }
         public virtual ICollection<Comment> Comments { get; set; }
         public virtual ICollection<StoryTag> StoryTags { get; set; }
+        public virtual ICollection<Media> MediaItems { get; set; } = new List<Media>();
     }
 }

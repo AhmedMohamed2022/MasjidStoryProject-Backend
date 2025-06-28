@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -24,5 +25,9 @@ namespace ViewModels
         public int? LanguageId { get; set; }
 
         public bool IsApproved { get; set; }
+        public List<IFormFile>? NewStoryImages { get; set; }
+        public List<string>? ExistingImageUrls { get; set; } // for showing previews or managing deletions
+
+
     }
 }

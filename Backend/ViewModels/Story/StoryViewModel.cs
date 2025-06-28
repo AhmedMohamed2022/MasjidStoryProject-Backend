@@ -22,6 +22,9 @@ namespace ViewModels
         public bool IsLikedByCurrentUser { get; set; }
 
         public List<CommentViewModel> Comments { get; set; }
+        public List<string> Tags { get; set; } = new List<string>();
+        public List<string> ImageUrls { get; set; } = new();
+
     }
 
 }

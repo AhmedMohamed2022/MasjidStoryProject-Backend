@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace ViewModels
         public int? LanguageId { get; set; }
 
         public List<string>? Tags { get; set; }
+        public List<IFormFile>? StoryImages { get; set; }
     }
 
 }

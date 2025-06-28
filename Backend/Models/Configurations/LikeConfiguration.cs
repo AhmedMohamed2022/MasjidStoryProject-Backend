@@ -26,7 +26,8 @@ namespace Models.Configurations
 
             builder.HasOne(l => l.Story)
                 .WithMany(s => s.Likes)
-                .HasForeignKey(l => l.StoryId);
+                .HasForeignKey(l => l.StoryId)
+                .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 

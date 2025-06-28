@@ -27,10 +27,25 @@ namespace ViewModels
                     .Where(c => c.IsActive)
                     .OrderByDescending(c => c.DatePosted)
                     .Select(c => c.ToViewModel())
-                    .ToList() ?? new()
+                    .ToList() ?? new(),
+                Tags = entity.StoryTags?.Select(st => st.Tag.Name).ToList() ?? new(),
+                ImageUrls = entity.MediaItems?.Select(m => m.FileUrl).ToList() ?? new()
             };
         }
 
+        public static StorySummaryViewModel ToSummaryViewModel(this Story entity)
+        {
+            return new StorySummaryViewModel
+            {
+                Id = entity.Id,
+                Title = entity.Title,
+                AuthorName = $"{entity.ApplicationUser?.FirstName} {entity.ApplicationUser?.LastName}",
+                DatePublished = entity.DatePublished,
+                LikeCount = entity.Likes?.Count ?? 0,
+                CommentCount = entity.Comments?.Count ?? 0,
+                ThumbnailUrl = entity.MediaItems?.FirstOrDefault()?.FileUrl ?? string.Empty
+            };
+        }
 
         public static Story ToEntity(this StoryCreateViewModel model, string userId)
         {
@@ -42,20 +57,20 @@ namespace ViewModels
                 LanguageId = model.LanguageId,
                 ApplicationUserId = userId,
                 DatePublished = DateTime.UtcNow,
-                IsApproved = false // pending approval
+                IsApproved = false
             };
         }
 
-        public static void UpdateEntity(this StoryEditViewModel vm, Models.Entities.Story entity)
+        public static void UpdateEntity(this StoryEditViewModel model, Story entity)
         {
-            entity.Title = vm.Title;
-            entity.Content = vm.Content;
-            entity.MasjidId = vm.MasjidId;
-            entity.LanguageId = vm.LanguageId;
-            entity.IsApproved = vm.IsApproved;
+            entity.Title = model.Title;
+            entity.Content = model.Content;
+            entity.MasjidId = model.MasjidId;
+            entity.LanguageId = model.LanguageId;
+            entity.IsApproved = model.IsApproved;
         }
 
-        public static StoryEditViewModel ToEditViewModel(this Models.Entities.Story entity)
+        public static StoryEditViewModel ToEditViewModel(this Story entity)
         {
             return new StoryEditViewModel
             {
@@ -64,8 +79,10 @@ namespace ViewModels
                 Content = entity.Content,
                 MasjidId = entity.MasjidId,
                 LanguageId = entity.LanguageId,
-                IsApproved = entity.IsApproved
+                IsApproved = entity.IsApproved,
+                ExistingImageUrls = entity.MediaItems?.Select(m => m.FileUrl).ToList() ?? new()
             };
         }
     }
+
 }

@@ -17,10 +17,11 @@ namespace Services
             _repo = repo;
         }
 
-        public async Task AddCommentAsync(CommentCreateViewModel model, string userId)
+        public async Task<CommentViewModel> AddCommentAsync(CommentCreateViewModel model, string userId)
         {
-            await _repo.AddAsync(model, userId);
+            return await _repo.AddAsync(model, userId);
         }
+
 
         public async Task<List<CommentViewModel>> GetCommentsByStoryAsync(int storyId)
         {

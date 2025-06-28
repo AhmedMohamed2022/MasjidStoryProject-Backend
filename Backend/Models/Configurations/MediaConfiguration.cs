@@ -25,7 +25,11 @@ namespace Models.Configurations
             builder.HasOne(md => md.Masjid)
                    .WithMany(m => m.MediaItems)
                    .HasForeignKey(md => md.MasjidId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(m => m.Story)
+                .WithMany(s => s.MediaItems)
+                .HasForeignKey(s => s.StoryId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

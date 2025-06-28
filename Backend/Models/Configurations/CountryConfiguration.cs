@@ -25,11 +25,11 @@ namespace Models.Configurations
             //    builder.Property(c => c.Code)
             //           .HasMaxLength(10);
 
-                // Relationships
-                builder.HasMany(c => c.Cities)
-                       .WithOne(cy => cy.Country)
-                       .HasForeignKey(cy => cy.CountryId)
-                       .OnDelete(DeleteBehavior.Cascade);
+                //// Relationships
+                //builder.HasMany(c => c.Cities)
+                //       .WithOne(cy => cy.Country)
+                //       .HasForeignKey(cy => cy.CountryId)
+                //       .OnDelete(DeleteBehavior.Cascade);
             }
         }      
 }

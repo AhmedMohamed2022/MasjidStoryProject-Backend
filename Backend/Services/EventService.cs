@@ -59,6 +59,67 @@ namespace Services
             await _attendeeRepo.SaveChangesAsync();
             return true;
         }
+        public async Task<EventViewModel?> GetEventDetailsAsync(int id, string? userId)
+        {
+            var ev = await _baseRepo.GetFirstOrDefaultAsync(
+                e => e.Id == id,
+                e => e.Masjid,
+                e => e.CreatedBy,
+                e => e.EventAttendees
+            );
+
+            return ev?.ToViewModel(userId);
+        }
+
+        public async Task<List<EventViewModel>> GetMasjidEventsAsync(int masjidId)
+        {
+            var events = await _baseRepo.FindAsync(
+                e => e.MasjidId == masjidId && e.EventDate >= DateTime.UtcNow,
+                e => e.Masjid
+            );
+
+            return events.Select(e => e.ToViewModel()).ToList();
+        }
+
+        public async Task<List<EventViewModel>> GetUserRegisteredEventsAsync(string userId)
+        {
+            var attendeeRecords = await _attendeeRepo.FindAsync(a => a.UserId == userId, a => a.Event);
+
+            var events = attendeeRecords
+                .Select(a => a.Event)
+                .Where(e => e != null)
+                .Distinct()
+                .ToList();
+
+            return events.Select(e => e.ToViewModel(userId)).ToList();
+        }
+
+        public async Task<bool> UpdateEventAsync(int id, EventCreateViewModel model, string userId)
+        {
+            var entity = await _baseRepo.GetByIdAsync(id);
+            if (entity == null || (entity.CreatedById != userId)) return false;
+
+            entity.Title = model.Title;
+            entity.Description = model.Description;
+            entity.EventDate = model.EventDate;
+            entity.LanguageId = model.LanguageId;
+            entity.MasjidId = model.MasjidId;
+
+            _baseRepo.Update(entity);
+            await _baseRepo.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteEventAsync(int id, string userId)
+        {
+            var entity = await _baseRepo.GetByIdAsync(id);
+            if (entity == null || entity.CreatedById != userId) return false;
+
+            _baseRepo.Delete(entity);
+            await _baseRepo.SaveChangesAsync();
+            return true;
+        }
+
     }
 
 }

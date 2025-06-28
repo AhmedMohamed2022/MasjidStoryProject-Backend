@@ -34,7 +34,6 @@ namespace MasjidStory.Controllers
             return Ok(comment);
         }
 
-        // POST: api/comment/add
         [HttpPost("add")]
         [Authorize]
         public async Task<IActionResult> Add([FromBody] CommentCreateViewModel model)
@@ -44,9 +43,25 @@ namespace MasjidStory.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
 
-            await _service.AddCommentAsync(model, userId);
-            return Ok("Comment added successfully.");
+            var comment = await _service.AddCommentAsync(model, userId);
+
+            var response = new
+            {
+                success = true,
+                data = new
+                {
+                    id = comment.Id,
+                    content = comment.Content,
+                    datePosted = comment.DatePosted,
+                    userName = comment.UserName,
+                    storyId = comment.StoryId
+                },
+                message = "Comment added successfully"
+            };
+
+            return Ok(response);
         }
+
 
         // GET: api/comment/story/{storyId}
         [HttpGet("story/{storyId}")]

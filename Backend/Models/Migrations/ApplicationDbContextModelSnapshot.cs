@@ -730,7 +730,7 @@ namespace Models.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MasjidId")
+                    b.Property<int?>("MasjidId")
                         .HasColumnType("int");
 
                     b.Property<string>("MediaType")
@@ -740,9 +740,14 @@ namespace Models.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasDefaultValue("Image");
 
+                    b.Property<int?>("StoryId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MasjidId");
+
+                    b.HasIndex("StoryId");
 
                     b.ToTable("Media", (string)null);
                 });
@@ -1005,7 +1010,7 @@ namespace Models.Migrations
                     b.HasOne("Models.Entities.Story", "Story")
                         .WithMany("Comments")
                         .HasForeignKey("StoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Models.Entities.ApplicationUser", "Author")
@@ -1117,7 +1122,7 @@ namespace Models.Migrations
                     b.HasOne("Models.Entities.Story", "Story")
                         .WithMany("Likes")
                         .HasForeignKey("StoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Models.Entities.ApplicationUser", "User")
@@ -1197,10 +1202,16 @@ namespace Models.Migrations
                     b.HasOne("Models.Entities.Masjid", "Masjid")
                         .WithMany("MediaItems")
                         .HasForeignKey("MasjidId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Models.Entities.Story", "Story")
+                        .WithMany("MediaItems")
+                        .HasForeignKey("StoryId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Masjid");
+
+                    b.Navigation("Story");
                 });
 
             modelBuilder.Entity("Models.Entities.Notification", b =>
@@ -1234,7 +1245,7 @@ namespace Models.Migrations
                     b.HasOne("Models.Entities.Masjid", "Masjid")
                         .WithMany("Stories")
                         .HasForeignKey("MasjidId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("ApplicationUser");
@@ -1249,13 +1260,13 @@ namespace Models.Migrations
                     b.HasOne("Models.Entities.Story", "Story")
                         .WithMany("StoryTags")
                         .HasForeignKey("StoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Models.Entities.Tag", "Tag")
                         .WithMany("StoryTags")
                         .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Story");
@@ -1341,6 +1352,8 @@ namespace Models.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Likes");
+
+                    b.Navigation("MediaItems");
 
                     b.Navigation("StoryTags");
                 });

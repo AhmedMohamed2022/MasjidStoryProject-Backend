@@ -1,4 +1,7 @@
-﻿using Models.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Models;
+using Models.Entities;
+using Repositories;
 using Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -6,57 +9,109 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ViewModels;
-using Repositories;
 
 namespace Repositories.Implementations
 {
     public class StoryRepository : IStoryRepository
     {
         private readonly IBaseRepository<Story> _baseRepo;
-
-        public StoryRepository(IBaseRepository<Story> baseRepo)
+        private readonly IBaseRepository<Media> _mediaRepo;
+        private readonly IBaseRepository<Tag> _tagRepo;
+        private readonly IBaseRepository<StoryTag> _storyTagRepo;
+        private readonly ApplicationDbContext _context;
+        public StoryRepository(
+            IBaseRepository<Story> baseRepo,
+            IBaseRepository<Media> mediaRepo,
+            IBaseRepository<Tag> tagRepo,
+            IBaseRepository<StoryTag> storyTagRepo,ApplicationDbContext context)
         {
             _baseRepo = baseRepo;
+            _mediaRepo = mediaRepo;
+            _tagRepo = tagRepo;
+            _storyTagRepo = storyTagRepo;
+            _context = context;
         }
 
-        public async Task<List<StoryViewModel>> GetAllAsync()
+        public async Task AddStoryAsync(StoryCreateViewModel model, string userId, List<string> imageUrls)
         {
-            // Eager load related data (User, Masjid, Language)
-            var stories = await _baseRepo.GetAllAsync(
-                s => s.ApplicationUser,
-                s => s.Masjid,
-                s => s.Language
-            );
+            var entity = model.ToEntity(userId);
 
-            return stories.Select(s => s.ToViewModel()).ToList();
+            // Save the Story first
+            await _baseRepo.AddAsync(entity);
+            await _baseRepo.SaveChangesAsync(); // get generated ID
+
+            // Save media (images)
+            if (imageUrls != null)
+            {
+                foreach (var url in imageUrls)
+                {
+                    await _mediaRepo.AddAsync(new Media
+                    {
+                        StoryId = entity.Id,
+                        FileUrl = url,
+                        MediaType = "Image",
+                        DateUploaded = DateTime.UtcNow
+                    });
+                }
+            }
+
+            // Save tags (reuse or create)
+            if (model.Tags?.Any() == true)
+            {
+                foreach (var tagName in model.Tags)
+                {
+                    var tag = (await _tagRepo.FindAsync(t => t.Name == tagName)).FirstOrDefault();
+                    if (tag == null)
+                    {
+                        tag = new Tag { Name = tagName };
+                        await _tagRepo.AddAsync(tag);
+                        await _tagRepo.SaveChangesAsync();
+                    }
+
+                    await _storyTagRepo.AddAsync(new StoryTag
+                    {
+                        StoryId = entity.Id,
+                        TagId = tag.Id
+                    });
+                }
+            }
+
+            await _mediaRepo.SaveChangesAsync();
+            await _storyTagRepo.SaveChangesAsync();
         }
+
+        // Keep rest of methods the same, but add `s => s.MediaItems`, `s => s.StoryTags` where relevant
+
         public async Task<StoryViewModel?> GetByIdAsync(int id, string? currentUserId = null)
         {
             var story = await _baseRepo.GetFirstOrDefaultAsync(
                 s => s.Id == id,
                 s => s.ApplicationUser,
                 s => s.Masjid,
+                s => s.Masjid.Contents,
                 s => s.Language,
                 s => s.Likes,
                 s => s.Comments,
-                s => s.Comments.Select(c => c.Author)
+                s => s.MediaItems,
+                s => s.StoryTags
             );
 
             return story?.ToViewModel(currentUserId);
         }
 
-        public async Task<StoryEditViewModel?> GetEditByIdAsync(int id)
+        public async Task<List<StoryViewModel>> GetAllAsync()
         {
-            var story = await _baseRepo.GetByIdAsync(id);
-            return story?.ToEditViewModel();
-        }
+            var stories = await _baseRepo.GetAllAsync(
+                s => s.ApplicationUser,
+                s => s.Masjid,
+                s => s.Masjid.Contents,
+                s => s.Language,
+                s => s.MediaItems,
+                s => s.StoryTags
+            );
 
-        //public async Task AddAsync(StoryCreateViewModel model)
-        //{
-        //    var entity = model.ToEntity();
-        //    await _baseRepo.AddAsync(entity);
-        //    await _baseRepo.SaveChangesAsync();
-        //}
+            return stories.Where(s => s.IsApproved == true).Select(s => s.ToViewModel()).ToList();
+        }
 
         public async Task<bool> UpdateAsync(StoryEditViewModel model)
         {
@@ -72,29 +127,112 @@ namespace Repositories.Implementations
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var entity = await _baseRepo.GetByIdAsync(id);
-            if (entity == null) return false;
+            // Load story with all dependent collections
+            var story = await _baseRepo.GetFirstOrDefaultAsync(
+                s => s.Id == id,
+                s => s.Comments,
+                s => s.Likes,
+                s => s.StoryTags,
+                s => s.MediaItems
+            );
 
-            _baseRepo.Delete(entity);
+            if (story == null)
+                return false;
+
+            // Delete comments
+            if (story.Comments != null)
+            {
+                foreach (var comment in story.Comments.ToList())
+                    _context.Remove(comment);
+            }
+
+            // Delete likes
+            if (story.Likes != null)
+            {
+                foreach (var like in story.Likes.ToList())
+                    _context.Remove(like);
+            }
+
+            // Delete story tags
+            if (story.StoryTags != null)
+            {
+                foreach (var tag in story.StoryTags.ToList())
+                    _context.Remove(tag);
+            }
+
+            // Delete media items
+            if (story.MediaItems != null)
+            {
+                foreach (var media in story.MediaItems.ToList())
+                    _context.Remove(media);
+            }
+
+            // Finally delete the story itself
+            _baseRepo.Delete(story);
             await _baseRepo.SaveChangesAsync();
             return true;
         }
-        public async Task AddStoryAsync(StoryCreateViewModel model, string userId)
-        {
-            var entity = model.ToEntity(userId);
-            await _baseRepo.AddAsync(entity);
-            await _baseRepo.SaveChangesAsync();
-        }
+
+
         public async Task<List<StoryViewModel>> GetPendingAsync()
         {
             var stories = await _baseRepo.FindAsync(
                 s => !s.IsApproved,
                 s => s.ApplicationUser,
                 s => s.Masjid,
-                s => s.Language
+                s => s.Masjid.Contents,
+                s => s.Language,
+                s => s.MediaItems,
+                s => s.StoryTags
             );
 
             return stories.Select(s => s.ToViewModel()).ToList();
+        }
+
+        public async Task<List<StoryViewModel>> GetLatestApprovedStoriesAsync(int count)
+        {
+            var stories = await _baseRepo.FindAsync(
+                s => s.IsApproved,
+                s => s.ApplicationUser,
+                s => s.Masjid,
+                s => s.Masjid.Contents,
+                s => s.Language,
+                s => s.MediaItems,
+                s => s.StoryTags
+            );
+
+            return stories.OrderByDescending(s => s.DatePublished)
+                .Take(count)
+                .Select(s => s.ToViewModel())
+                .ToList();
+        }
+
+        public async Task<List<StoryViewModel>> GetRelatedStoriesAsync(int storyId)
+        {
+            var refStory = await _baseRepo.GetFirstOrDefaultAsync(
+                s => s.Id == storyId,
+                s => s.Masjid,
+                s => s.Masjid.Contents,
+                s => s.Language
+            );
+
+            if (refStory == null) return new();
+
+            var related = await _baseRepo.FindAsync(
+                s => s.Id != storyId && s.IsApproved &&
+                     (s.MasjidId == refStory.MasjidId || s.LanguageId == refStory.LanguageId),
+                s => s.ApplicationUser,
+                s => s.Masjid,
+                s => s.Masjid.Contents,
+                s => s.Language,
+                s => s.MediaItems,
+                s => s.StoryTags
+            );
+
+            return related.OrderByDescending(s => s.DatePublished)
+                .Take(3)
+                .Select(s => s.ToViewModel())
+                .ToList();
         }
 
         public async Task<bool> ApproveAsync(int id)
@@ -107,22 +245,16 @@ namespace Repositories.Implementations
             await _baseRepo.SaveChangesAsync();
             return true;
         }
-        public async Task<List<StoryViewModel>> GetLatestApprovedStoriesAsync(int count)
+
+        public async Task<StoryEditViewModel?> GetEditByIdAsync(int id)
         {
-            var stories = await _baseRepo.GetAllAsync(
-                s => s.ApplicationUser,
-                s => s.Masjid,
-                s => s.Language
+            var entity = await _baseRepo.GetFirstOrDefaultAsync(
+                s => s.Id == id,
+                s => s.MediaItems
             );
 
-            return stories
-                .Where(s => s.IsApproved)
-                .OrderByDescending(s => s.DatePublished)
-                .Take(count)
-                .Select(s => s.ToViewModel())
-                .ToList();
+            return entity?.ToEditViewModel();
         }
-
-
     }
+
 }

@@ -58,5 +58,40 @@ namespace Services
                 MediaType = m.MediaType
             }).ToList();
         }
+        public async Task<string?> UploadUserProfilePictureAsync(IFormFile file)
+        {
+            var uploadsPath = Path.Combine(_env.WebRootPath, "uploads", "profile");
+            if (!Directory.Exists(uploadsPath))
+                Directory.CreateDirectory(uploadsPath);
+
+            var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+            var filePath = Path.Combine(uploadsPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Return the relative URL for the frontend
+            return $"/uploads/profile/{fileName}";
+        }
+        public async Task<string?> UploadToPathAsync(IFormFile file, string folder = "general")
+        {
+            var uploadsRoot = Path.Combine(_env.WebRootPath, "uploads", folder);
+            if (!Directory.Exists(uploadsRoot))
+                Directory.CreateDirectory(uploadsRoot);
+
+            var fileName = $"{Guid.NewGuid()}_{file.FileName}";
+            var filePath = Path.Combine(uploadsRoot, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            // Return the relative URL
+            return $"/uploads/{folder}/{fileName}";
+        }
+
     }
 }

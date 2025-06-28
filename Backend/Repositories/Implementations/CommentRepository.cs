@@ -57,12 +57,23 @@ namespace Repositories.Implementations
         /// <summary>
         /// Adds a new comment to the database.
         /// </summary>
-        public async Task AddAsync(CommentCreateViewModel model, string userId)
+        public async Task<CommentViewModel> AddAsync(CommentCreateViewModel model, string userId)
         {
             var entity = model.ToEntity(userId);
             await _baseRepo.AddAsync(entity);
             await _baseRepo.SaveChangesAsync();
+
+            // Fetch the inserted comment with navigation properties
+            var inserted = await _baseRepo.GetFirstOrDefaultAsync(
+                c => c.Id == entity.Id,
+                c => c.Story,
+                c => c.Author
+            );
+
+            // Map to ViewModel and return
+            return inserted.ToViewModel();
         }
+
 
         /// <summary>
         /// Updates the content of an existing comment.

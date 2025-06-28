@@ -25,7 +25,7 @@ namespace MasjidStory.Controllers
             return Ok(stories);
         }
 
-        // GET: api/story/details/{id
+        // GET: api/story/details/{id}
         [HttpGet("details/{id}")]
         public async Task<ActionResult<StoryViewModel>> GetById(int id)
         {
@@ -40,9 +40,25 @@ namespace MasjidStory.Controllers
             return Ok(story);
         }
 
+        // POST: api/story/add
+        [Authorize]
+        [HttpPost("add")]
+        [RequestSizeLimit(10 * 1024 * 1024)] // Max 10 MB total for uploaded images
+        public async Task<IActionResult> AddStory([FromForm] StoryCreateViewModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            await _service.AddStoryAsync(model, userId);
+            return Ok(ApiResponse<string>.Ok("Story submitted and pending approval."));
+        }
+
         // PUT: api/story/update/{id}
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] StoryEditViewModel model)
+        [Authorize]
+        public async Task<IActionResult> Update(int id, [FromForm] StoryEditViewModel model)
         {
             if (id != model.Id)
                 return BadRequest("ID mismatch");
@@ -51,11 +67,12 @@ namespace MasjidStory.Controllers
             if (!result)
                 return NotFound();
 
-            return Ok();
+            return Ok(ApiResponse<string>.Ok("Story updated successfully."));
         }
 
         // DELETE: api/story/delete/{id}
         [HttpDelete("delete/{id}")]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteStoryAsync(id);
@@ -64,20 +81,7 @@ namespace MasjidStory.Controllers
 
             return NoContent();
         }
-        [Authorize]
-        [HttpPost]
-        [Route("add")]
-        public async Task<IActionResult> AddStory([FromBody] StoryCreateViewModel model)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            // Get user ID from identity (in real app, this must be authenticated)
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null) return Unauthorized();
-
-            await _service.AddStoryAsync(model, userId);
-            return Ok("Story submitted and pending approval.");
-        }
         // GET: api/story/pending
         [HttpGet("pending")]
         [Authorize(Roles = "Admin")]
@@ -95,8 +99,10 @@ namespace MasjidStory.Controllers
             var result = await _service.ApproveStoryAsync(id);
             if (!result) return NotFound();
 
-            return Ok("Story approved successfully.");
+            return Ok(ApiResponse<string>.Ok("Story Approved."));
         }
+
+        // GET: api/story/latest
         [HttpGet("latest")]
         public async Task<ActionResult<List<StoryViewModel>>> GetLatestStories()
         {
@@ -104,6 +110,12 @@ namespace MasjidStory.Controllers
             return Ok(ApiResponse<List<StoryViewModel>>.Ok(stories));
         }
 
-
+        // GET: api/story/related/{storyId}
+        [HttpGet("related/{storyId}")]
+        public async Task<ActionResult<List<StoryViewModel>>> GetRelatedStories(int storyId)
+        {
+            var relatedStories = await _service.GetRelatedStoriesAsync(storyId);
+            return Ok(ApiResponse<List<StoryViewModel>>.Ok(relatedStories));
+        }
     }
 }

@@ -10,10 +10,17 @@ namespace Models.Entities
     public class Media
     {
         public int Id { get; set; }
-        public int MasjidId { get; set; }
-        public virtual Masjid Masjid { get; set; }
+
+        // Optional relation: Masjid OR Story
+        public int? MasjidId { get; set; }
+        public virtual Masjid? Masjid { get; set; }
+
+        public int? StoryId { get; set; }
+        public virtual Story? Story { get; set; }
+
         public string FileUrl { get; set; }
         public string MediaType { get; set; } = "Image";
         public DateTime DateUploaded { get; set; } = DateTime.UtcNow;
     }
+
 }

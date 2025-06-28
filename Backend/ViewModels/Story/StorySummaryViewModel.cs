@@ -14,6 +14,8 @@ namespace ViewModels
         public DateTime DatePublished { get; set; }
         public int LikeCount { get; set; }
         public int CommentCount { get; set; }
+        public string ThumbnailUrl { get; set; } = string.Empty;
+
     }
 
 }

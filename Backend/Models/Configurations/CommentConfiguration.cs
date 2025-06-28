@@ -34,6 +34,7 @@ namespace Models.Configurations
             builder.HasOne(c => c.Story)
                 .WithMany(s => s.Comments)
                 .HasForeignKey(c => c.StoryId)
+                .OnDelete(DeleteBehavior.Restrict)
                 ;
         }
     }
