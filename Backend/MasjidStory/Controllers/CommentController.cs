@@ -54,7 +54,8 @@ namespace MasjidStory.Controllers
                     content = comment.Content,
                     datePosted = comment.DatePosted,
                     userName = comment.UserName,
-                    storyId = comment.StoryId
+                    contentId = comment.ContentId,
+                    contentType = comment.ContentType
                 },
                 message = "Comment added successfully"
             };
@@ -62,12 +63,35 @@ namespace MasjidStory.Controllers
             return Ok(response);
         }
 
-
         // GET: api/comment/story/{storyId}
         [HttpGet("story/{storyId}")]
         public async Task<ActionResult<List<CommentViewModel>>> GetByStory(int storyId)
         {
-            var comments = await _service.GetCommentsByStoryAsync(storyId);
+            var comments = await _service.GetCommentsByContentAsync(storyId, "Story");
+            return Ok(comments);
+        }
+
+        // GET: api/comment/event/{eventId}
+        [HttpGet("event/{eventId}")]
+        public async Task<ActionResult<List<CommentViewModel>>> GetByEvent(int eventId)
+        {
+            var comments = await _service.GetCommentsByContentAsync(eventId, "Event");
+            return Ok(comments);
+        }
+
+        // GET: api/comment/community/{communityId}
+        [HttpGet("community/{communityId}")]
+        public async Task<ActionResult<List<CommentViewModel>>> GetByCommunity(int communityId)
+        {
+            var comments = await _service.GetCommentsByContentAsync(communityId, "Community");
+            return Ok(comments);
+        }
+
+        // GET: api/comment/content/{contentType}/{contentId}
+        [HttpGet("content/{contentType}/{contentId}")]
+        public async Task<ActionResult<List<CommentViewModel>>> GetByContent(string contentType, int contentId)
+        {
+            var comments = await _service.GetCommentsByContentAsync(contentId, contentType);
             return Ok(comments);
         }
 

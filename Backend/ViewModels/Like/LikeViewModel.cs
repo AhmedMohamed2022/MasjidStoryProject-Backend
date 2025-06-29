@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +10,10 @@ namespace ViewModels
     public class LikeViewModel
     {
         public int Id { get; set; }
+        public int ContentId { get; set; }
+        public string ContentType { get; set; }
         public int StoryId { get; set; }
         public string UserId { get; set; }
         public DateTime DateLiked { get; set; }
     }
-}
-
+} 

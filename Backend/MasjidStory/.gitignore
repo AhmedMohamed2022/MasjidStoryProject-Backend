@@ -1,3 +1,10 @@
+# ========== Environment Variables ========== #
+.env
+.env.local
+.env.production
+.env.development
+*.env
+
 # ========== Core build output ========== #
 bin/
 obj/

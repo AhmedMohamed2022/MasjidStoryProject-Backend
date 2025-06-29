@@ -111,5 +111,18 @@ namespace Repositories.Implementations
             return comments.Select(c => c.ToViewModel()).ToList();
         }
 
+        /// <summary>
+        /// Gets comments by content ID and type (for stories, events, communities)
+        /// </summary>
+        public async Task<List<CommentViewModel>> GetByContentAsync(int contentId, string contentType)
+        {
+            var comments = await _baseRepo.FindAsync(
+                c => c.ContentId == contentId && c.ContentType == contentType && c.IsActive,
+                c => c.Author
+            );
+
+            return comments.Select(c => c.ToViewModel()).ToList();
+        }
+
     }
 }

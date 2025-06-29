@@ -18,7 +18,9 @@ namespace Repositories.Interfaces
         //Task<LikeViewModel?> GetByIdAsync(int id);
         //Task AddAsync(LikeCreateViewModel model);
         //Task<bool> DeleteAsync(int id);
-        Task<bool> ToggleLikeAsync(int storyId, string userId);
+        Task<bool> ToggleLikeAsync(int contentId, string contentType, string userId);
+        Task<int> GetLikeCountAsync(int contentId, string contentType);
+        Task<bool> IsLikedByUserAsync(int contentId, string contentType, string userId);
     }
 }
 

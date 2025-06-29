@@ -15,7 +15,11 @@ namespace Models.Entities
         public virtual ApplicationUser User { get; set; }
         public string Title { get; set; }
         public string Text { get; set; }
+        public string Type { get; set; }
+        public string ContentType { get; set; }
+        public int? ContentId { get; set; }
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
         public bool IsRead { get; set; } = false;
+        public string SenderName { get; set; }
     }
 }

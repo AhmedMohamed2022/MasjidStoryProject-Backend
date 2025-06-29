@@ -99,9 +99,9 @@ namespace MasjidStory.Controllers
             return Ok(ApiResponse<string>.Ok("Community deleted successfully."));
         }
 
-        // Get all communities (for admin)
+        // Get all communities 
         [HttpGet("all")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<ActionResult<List<CommunityViewModel>>> GetAllCommunities()
         {
             var communities = await _service.GetAllCommunitiesAsync();

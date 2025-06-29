@@ -11,10 +11,14 @@ namespace MasjidStory.Controllers
     public class StoryController : ControllerBase
     {
         private readonly StoryService _service;
+        private readonly MediaService _mediaService;
+        private readonly ContentModerationService _contentModerationService;
 
-        public StoryController(StoryService service)
+        public StoryController(StoryService service, MediaService mediaService, ContentModerationService contentModerationService)
         {
             _service = service;
+            _mediaService = mediaService;
+            _contentModerationService = contentModerationService;
         }
 
         // GET: api/story/all
@@ -22,6 +26,26 @@ namespace MasjidStory.Controllers
         public async Task<ActionResult<List<StoryViewModel>>> GetAll()
         {
             var stories = await _service.GetAllStoriesAsync();
+            return Ok(stories);
+        }
+
+        // GET: api/story/paginated
+        [HttpGet("paginated")]
+        public async Task<ActionResult<PaginatedResponse<StoryViewModel>>> GetPaginated([FromQuery] int page = 1, [FromQuery] int size = 10)
+        {
+            var result = await _service.GetStoriesPaginatedAsync(page, size);
+            return Ok(result);
+        }
+
+        // GET: api/story/my-stories
+        [HttpGet("my-stories")]
+        [Authorize]
+        public async Task<ActionResult<List<StoryViewModel>>> GetMyStories()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            var stories = await _service.GetStoriesByUserIdAsync(userId);
             return Ok(stories);
         }
 
@@ -48,12 +72,33 @@ namespace MasjidStory.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null) return Unauthorized();
+            try
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null) return Unauthorized();
 
-            //await _service.AddStoryAsync(model, userId);
-            await _service.AddStoryAsync(model);
-            return Ok(ApiResponse<string>.Ok("Story submitted and pending approval."));
+                var storyId= await _service.AddStoryAsync(model, userId);
+
+                // Handle media uploads if any
+                if (model.StoryImages != null && model.StoryImages.Any())
+                {
+                    foreach (var file in model.StoryImages)
+                    {
+                        var mediaModel = new MediaCreateViewModel
+                        {
+                            StoryId = storyId,
+                            File = file
+                        };
+                        await _mediaService.UploadMediaAsync(mediaModel);
+                    }
+                }
+
+                return Ok(ApiResponse<string>.Ok("Story submitted and pending approval."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<string>.Fail($"Failed to submit a story: {ex.Message}"));
+            }
         }
 
         // PUT: api/story/update/{id}
@@ -63,12 +108,84 @@ namespace MasjidStory.Controllers
         {
             if (id != model.Id)
                 return BadRequest("ID mismatch");
+            try
+            {
+                // Get current story with media items
+                var currentStory = await _service.GetStoryByIdAsync(id);
+                if (currentStory == null)
+                    return NotFound();
 
-            var result = await _service.UpdateStoryAsync(model);
-            if (!result)
-                return NotFound();
+                // Analyze content changes to determine if re-approval is needed
+                var contentAnalysis = _contentModerationService.AnalyzeContentChanges(model, currentStory);
+                
+                // Set the original content for tracking
+                model.OriginalTitle = currentStory.Title;
+                model.OriginalContent = currentStory.Content;
+                model.RequiresReapproval = contentAnalysis.RequiresReapproval;
+                model.ChangeReason = string.Join(", ", contentAnalysis.ChangeReason);
 
-            return Ok(ApiResponse<string>.Ok("Story updated successfully."));
+                // If significant changes detected, set story to pending
+                if (contentAnalysis.RequiresReapproval)
+                {
+                    model.IsApproved = false;
+                }
+
+                // Handle media deletions based on KeepMediaIds
+                if (currentStory.MediaItems != null && currentStory.MediaItems.Any())
+                {
+                    var currentMediaIds = currentStory.MediaItems.Select(m => m.Id).ToList();
+                    var keepMediaIds = model.KeepMediaIds ?? new List<int>();
+                    
+                    // Find media items to delete (those not in keepMediaIds)
+                    var mediaToDelete = currentMediaIds.Except(keepMediaIds).ToList();
+                    
+                    foreach (var mediaId in mediaToDelete)
+                    {
+                        await _mediaService.DeleteMediaAsync(mediaId);
+                    }
+                }
+
+                // Handle specific media removals
+                if (model.RemoveMediaIds != null && model.RemoveMediaIds.Any())
+                {
+                    foreach (var mediaId in model.RemoveMediaIds)
+                    {
+                        await _mediaService.DeleteMediaAsync(mediaId);
+                    }
+                }
+
+                // Handle new media uploads
+                if (model.NewStoryImages != null && model.NewStoryImages.Any())
+                {
+                    foreach (var file in model.NewStoryImages)
+                    {
+                        var mediaModel = new MediaCreateViewModel
+                        {
+                            StoryId = id,
+                            File = file
+                        };
+                        await _mediaService.UploadMediaAsync(mediaModel);
+                    }
+                }
+
+                var result = await _service.UpdateStoryAsync(model);
+                if (!result)
+                    return NotFound();
+
+                // Return appropriate message based on content analysis
+                if (contentAnalysis.RequiresReapproval)
+                {
+                    return Ok(ApiResponse<string>.Ok($"Story updated successfully. Due to significant changes ({string.Join(", ", contentAnalysis.ChangeReason)}), the story has been set to pending for admin approval."));
+                }
+                else
+                {
+                    return Ok(ApiResponse<string>.Ok("Story updated successfully."));
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<string>.Fail($"Failed to update story: {ex.Message}"));
+            }
         }
 
         // DELETE: api/story/delete/{id}
@@ -117,6 +234,35 @@ namespace MasjidStory.Controllers
         {
             var relatedStories = await _service.GetRelatedStoriesAsync(storyId);
             return Ok(ApiResponse<List<StoryViewModel>>.Ok(relatedStories));
+        }
+
+        // DELETE: api/story/{storyId}/media/{mediaId}
+        [HttpDelete("{storyId}/media/{mediaId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteStoryMedia(int storyId, int mediaId)
+        {
+            try
+            {
+                // Verify the story belongs to the current user
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (userId == null) return Unauthorized();
+
+                var story = await _service.GetStoryByIdAsync(storyId, userId);
+                if (story == null) return NotFound();
+
+                // Verify the media belongs to this story
+                var mediaExists = story.MediaItems?.Any(m => m.Id == mediaId) == true;
+                if (!mediaExists) return NotFound();
+
+                var result = await _mediaService.DeleteMediaAsync(mediaId);
+                if (!result) return NotFound();
+
+                return Ok(ApiResponse<string>.Ok("Media deleted successfully."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<string>.Fail($"Failed to delete media: {ex.Message}"));
+            }
         }
     }
 }

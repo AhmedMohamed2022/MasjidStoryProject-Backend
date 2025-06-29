@@ -11,6 +11,9 @@ namespace ViewModels
     public class LikeCreateViewModel
     {
         [Required]
-        public int StoryId { get; set; }
+        public int ContentId { get; set; }
+        
+        [Required]
+        public string ContentType { get; set; } // "Story", "Event", "Community"
     }
 }

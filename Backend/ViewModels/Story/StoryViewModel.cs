@@ -24,6 +24,7 @@ namespace ViewModels
         public List<CommentViewModel> Comments { get; set; }
         public List<string> Tags { get; set; } = new List<string>();
         public List<string> ImageUrls { get; set; } = new();
+        public List<MediaViewModel> MediaItems { get; set; } = new();
 
     }
 

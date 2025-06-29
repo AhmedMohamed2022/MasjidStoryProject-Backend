@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,8 @@ namespace ViewModels
     public class CommentViewModel
     {
         public int Id { get; set; }
+        public int ContentId { get; set; }
+        public string ContentType { get; set; }
         public int StoryId { get; set; }
         public string StoryTitle { get; set; }
         public string UserId { get; set; }
@@ -18,4 +20,4 @@ namespace ViewModels
         public DateTime DatePosted { get; set; }
         public bool IsActive { get; set; }
     }
-}
+} 

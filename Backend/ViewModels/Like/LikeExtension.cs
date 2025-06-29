@@ -20,7 +20,9 @@ namespace ViewModels
             return new LikeViewModel
             {
                 Id = entity.Id,
-                StoryId = entity.StoryId,
+                ContentId = entity.ContentId,
+                ContentType = entity.ContentType,
+                StoryId = entity.StoryId ?? 0, // Handle nullable StoryId
                 UserId = entity.UserId,
                 DateLiked = entity.DateLiked
             };
@@ -31,7 +33,9 @@ namespace ViewModels
         {
             return new Like
             {
-                StoryId = model.StoryId,
+                ContentId = model.ContentId,
+                ContentType = model.ContentType,
+                StoryId = model.ContentType == "Story" ? model.ContentId : null, // Set StoryId only for stories
                 DateLiked = DateTime.UtcNow
             };
         }

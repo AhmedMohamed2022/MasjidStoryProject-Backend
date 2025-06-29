@@ -15,7 +15,9 @@ namespace ViewModels
             return new CommentViewModel
             {
                 Id = entity.Id,
-                StoryId = entity.StoryId,
+                ContentId = entity.ContentId,
+                ContentType = entity.ContentType,
+                StoryId = entity.StoryId ?? 0, // Handle nullable StoryId
                 StoryTitle = entity.Story?.Title,
                 UserId = entity.UserId,
                 UserName = entity.Author?.UserName,
@@ -30,7 +32,9 @@ namespace ViewModels
         {
             return new Comment
             {
-                StoryId = model.StoryId,
+                ContentId = model.ContentId,
+                ContentType = model.ContentType,
+                StoryId = model.ContentType == "Story" ? model.ContentId : null, // Set StoryId only for stories
                 Content = model.Content,
                 UserId = userId,
                 DatePosted = DateTime.UtcNow,
@@ -38,12 +42,10 @@ namespace ViewModels
             };
         }
 
-
         // Update existing entity from edit model
         public static void UpdateEntity(this CommentEditViewModel model, Comment entity)
         {
             entity.Content = model.Content;
         }
     }
-
 }

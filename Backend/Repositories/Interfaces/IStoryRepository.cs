@@ -11,15 +11,18 @@ namespace Repositories.Interfaces
     {
         Task<List<StoryViewModel>> GetAllAsync();
         Task<StoryViewModel?> GetByIdAsync(int id, string? currentUserId = null);
-        Task<StoryEditViewModel?> GetEditByIdAsync(int id);
+        //Task<StoryEditViewModel?> GetEditByIdAsync(int id);
         Task<bool> UpdateAsync(StoryEditViewModel model);
         Task<bool> DeleteAsync(int id);
-        Task AddStoryAsync(StoryCreateViewModel model, string userId, List<string> imageUrls);
-        Task AddStoryAsync(StoryCreateViewModel model);
+        //Task AddStoryAsync(StoryCreateViewModel model, string userId, List<string> imageUrls);
+        Task<int> AddStoryAsync(StoryCreateViewModel model,string userId);
         Task<List<StoryViewModel>> GetPendingAsync();
         Task<bool> ApproveAsync(int id);
         Task<List<StoryViewModel>> GetLatestApprovedStoriesAsync(int count);
         Task<List<StoryViewModel>> GetRelatedStoriesAsync(int storyId);
+        Task<List<StoryViewModel>> GetStoriesByUserIdAsync(string userId);
+        Task<PaginatedResponse<StoryViewModel>> GetPaginatedAsync(int page, int size);
+
     }
 
 }

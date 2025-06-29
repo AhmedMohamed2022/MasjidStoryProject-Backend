@@ -14,6 +14,7 @@ namespace Repositories.Interfaces
     public interface ICommentRepository
     {
         Task<CommentViewModel> AddAsync(CommentCreateViewModel model, string userId);
+        Task<List<CommentViewModel>> GetByContentAsync(int contentId, string contentType);
         Task<List<CommentViewModel>> GetByStoryIdAsync(int storyId);
         Task<List<CommentViewModel>> GetAllAsync(); // keep for admin if needed
         Task<CommentViewModel?> GetByIdAsync(int id);

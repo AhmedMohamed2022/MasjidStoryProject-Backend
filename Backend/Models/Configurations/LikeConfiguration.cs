@@ -17,6 +17,13 @@ namespace Models.Configurations
 
             builder.HasKey(l => l.Id);
 
+            builder.Property(l => l.ContentId)
+                .IsRequired();
+
+            builder.Property(l => l.ContentType)
+                .IsRequired()
+                .HasMaxLength(50);
+
             builder.Property(l => l.DateLiked)
                 .HasDefaultValueSql("GETDATE()");
 
@@ -24,11 +31,12 @@ namespace Models.Configurations
                 .WithMany()
                 .HasForeignKey(l => l.UserId);
 
+            // Optional relationship for backward compatibility
             builder.HasOne(l => l.Story)
                 .WithMany(s => s.Likes)
                 .HasForeignKey(l => l.StoryId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
         }
     }
-
 }

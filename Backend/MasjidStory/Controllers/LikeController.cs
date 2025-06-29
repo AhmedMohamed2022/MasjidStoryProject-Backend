@@ -26,9 +26,30 @@ namespace MasjidStory.Controllers
             {
                 return Unauthorized("User is not authenticated.");
             }
-            var liked = await _likeService.ToggleLikeAsync(model.StoryId, userId);
+            
+            var liked = await _likeService.ToggleLikeAsync(model.ContentId, model.ContentType, userId);
             return Ok(new { success = true, liked });
         }
 
+        [HttpGet("count/{contentType}/{contentId}")]
+        public async Task<IActionResult> GetLikeCount(string contentType, int contentId)
+        {
+            var count = await _likeService.GetLikeCountAsync(contentId, contentType);
+            return Ok(new { success = true, count });
+        }
+
+        [HttpGet("status/{contentType}/{contentId}")]
+        [Authorize]
+        public async Task<IActionResult> GetLikeStatus(string contentType, int contentId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User is not authenticated.");
+            }
+            
+            var isLiked = await _likeService.IsLikedByUserAsync(contentId, contentType, userId);
+            return Ok(new { success = true, isLiked });
+        }
     }
 }

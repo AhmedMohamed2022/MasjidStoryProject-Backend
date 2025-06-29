@@ -17,6 +17,13 @@ namespace Models.Configurations
 
             builder.HasKey(c => c.Id);
 
+            builder.Property(c => c.ContentId)
+                .IsRequired();
+
+            builder.Property(c => c.ContentType)
+                .IsRequired()
+                .HasMaxLength(50);
+
             builder.Property(c => c.Content)
                 .IsRequired();
 
@@ -31,12 +38,12 @@ namespace Models.Configurations
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Optional relationship for backward compatibility
             builder.HasOne(c => c.Story)
                 .WithMany(s => s.Comments)
                 .HasForeignKey(c => c.StoryId)
                 .OnDelete(DeleteBehavior.Restrict)
-                ;
+                .IsRequired(false);
         }
     }
-
 }

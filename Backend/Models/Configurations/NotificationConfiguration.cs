@@ -18,7 +18,23 @@ namespace Models.Configurations
             builder.HasKey(n => n.Id);
 
             builder.Property(n => n.Title)
-                .IsRequired();
+                .IsRequired()
+                .HasMaxLength(200);
+
+            builder.Property(n => n.Text)
+                .IsRequired()
+                .HasMaxLength(1000);
+
+            builder.Property(n => n.Type)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.Property(n => n.ContentType)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.Property(n => n.SenderName)
+                .HasMaxLength(100);
 
             builder.Property(n => n.DateCreated)
                 .HasDefaultValueSql("GETDATE()");

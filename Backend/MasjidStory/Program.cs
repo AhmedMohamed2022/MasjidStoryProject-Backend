@@ -26,7 +26,10 @@ namespace MasjidStory
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+                options.UseLazyLoadingProxies().UseSqlServer(
+                    Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING") ?? 
+                    builder.Configuration.GetConnectionString("DefaultConnection")
+                ));
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                  .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
@@ -51,6 +54,8 @@ namespace MasjidStory
             builder.Services.AddScoped<LanguageService>();
             builder.Services.AddScoped<CommunityService>();
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<ContentModerationService>();
+            builder.Services.AddScoped<NotificationService>();
             // Authentication
             builder.Services.AddAuthentication(options =>
             {
@@ -64,10 +69,10 @@ namespace MasjidStory
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "MasjidStoryApp",
+                    ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "MasjidStoryUsers",
                     IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                    Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new InvalidOperationException("JWT_KEY environment variable is required")))
                 };
             });
 
@@ -169,18 +174,18 @@ namespace MasjidStory
                     if (!roleExists)
                         await roleManager.CreateAsync(new IdentityRole(role));
                 }
-                // Seed Admin User from appsettings
+                // Seed Admin User from environment variables
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-                var adminEmail = builder.Configuration["AdminUser:Email"];
-                var adminPassword = builder.Configuration["AdminUser:Password"];
-                var firstName = builder.Configuration["AdminUser:FirstName"];
-                var lastName = builder.Configuration["AdminUser:LastName"];
+                var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
+                var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD");
+                var firstName = Environment.GetEnvironmentVariable("ADMIN_FIRST_NAME") ?? "Super";
+                var lastName = Environment.GetEnvironmentVariable("ADMIN_LAST_NAME") ?? "Admin";
 
                 var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
                 if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
                 {
-                    Console.WriteLine("⚠ Admin credentials are missing from appsettings.json");
+                    Console.WriteLine("⚠ Admin credentials are missing from environment variables");
                 }
 
                 if (adminUser == null)
