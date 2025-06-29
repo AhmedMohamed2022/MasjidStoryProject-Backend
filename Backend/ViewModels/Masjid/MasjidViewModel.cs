@@ -16,7 +16,9 @@ namespace ViewModels
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
         public string CountryName { get; set; }
+        public int CountryId { get; set; }
         public string CityName { get; set; }
+        public int CityId { get; set; }
         public int? YearOfEstablishment { get; set; }
         public DateTime DateOfRecord { get; set; }
     }

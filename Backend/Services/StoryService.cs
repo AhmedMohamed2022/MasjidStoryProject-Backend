@@ -19,22 +19,22 @@ namespace Services
             _mediaService = mediaService;
         }
 
-        public async Task AddStoryAsync(StoryCreateViewModel model, string userId)
-        {
-            var imageUrls = new List<string>();
+        //public async Task AddStoryAsync(StoryCreateViewModel model, string userId)
+        //{
+        //    var imageUrls = new List<string>();
 
-            if (model.StoryImages != null)
-            {
-                foreach (var image in model.StoryImages)
-                {
-                    var url = await _mediaService.UploadToPathAsync(image, "story");
-                    if (url != null)
-                        imageUrls.Add(url);
-                }
-            }
+        //    if (model.StoryImages != null)
+        //    {
+        //        foreach (var image in model.StoryImages)
+        //        {
+        //            var url = await _mediaService.UploadToPathAsync(image, "story");
+        //            if (url != null)
+        //                imageUrls.Add(url);
+        //        }
+        //    }
 
-            await _repository.AddStoryAsync(model, userId, imageUrls);
-        }
+        //    await _repository.AddStoryAsync(model, userId, imageUrls);
+        //}
 
         public async Task<List<StoryViewModel>> GetAllStoriesAsync()
         {
@@ -46,10 +46,10 @@ namespace Services
             return await _repository.GetByIdAsync(id, userId);
         }
 
-        //public async Task AddStoryAsync(StoryCreateViewModel model)
-        //{
-        //    await _repository.AddAsync(model);
-        //}
+        public async Task AddStoryAsync(StoryCreateViewModel model)
+        {
+            await _repository.AddStoryAsync(model);
+        }
 
         public async Task<bool> UpdateStoryAsync(StoryEditViewModel model)
         {

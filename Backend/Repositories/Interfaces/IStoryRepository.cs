@@ -15,6 +15,7 @@ namespace Repositories.Interfaces
         Task<bool> UpdateAsync(StoryEditViewModel model);
         Task<bool> DeleteAsync(int id);
         Task AddStoryAsync(StoryCreateViewModel model, string userId, List<string> imageUrls);
+        Task AddStoryAsync(StoryCreateViewModel model);
         Task<List<StoryViewModel>> GetPendingAsync();
         Task<bool> ApproveAsync(int id);
         Task<List<StoryViewModel>> GetLatestApprovedStoriesAsync(int count);

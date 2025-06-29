@@ -60,6 +60,18 @@ namespace ViewModels
                 IsApproved = false
             };
         }
+        public static Story ToEntity(this StoryCreateViewModel model)
+        {
+            return new Story
+            {
+                Title = model.Title,
+                Content = model.Content,
+                MasjidId = model.MasjidId,
+                LanguageId = model.LanguageId,
+                DatePublished = DateTime.UtcNow,
+                IsApproved = false
+            };
+        }
 
         public static void UpdateEntity(this StoryEditViewModel model, Story entity)
         {

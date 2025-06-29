@@ -51,7 +51,8 @@ namespace MasjidStory.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
 
-            await _service.AddStoryAsync(model, userId);
+            //await _service.AddStoryAsync(model, userId);
+            await _service.AddStoryAsync(model);
             return Ok(ApiResponse<string>.Ok("Story submitted and pending approval."));
         }
 

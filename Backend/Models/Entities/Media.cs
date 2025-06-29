@@ -19,8 +19,12 @@ namespace Models.Entities
         public virtual Story? Story { get; set; }
 
         public string FileUrl { get; set; }
+        public string FileName { get; set; } = string.Empty;
+        public long FileSize { get; set; }
         public string MediaType { get; set; } = "Image";
+        public string ContentType { get; set; } = "image/jpeg"; // Default to JPEG, can be overridden
         public DateTime DateUploaded { get; set; } = DateTime.UtcNow;
+        
     }
 
 }

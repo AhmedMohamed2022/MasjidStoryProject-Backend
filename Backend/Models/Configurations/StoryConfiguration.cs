@@ -36,14 +36,15 @@ namespace Models.Configurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(s => s.Masjid)
-                .WithMany(m=>m.Stories)
+                .WithMany(m => m.Stories)
                 .HasForeignKey(s => s.MasjidId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.HasOne(s => s.Language)
-                .WithMany(m=>m.Stories)
+                .WithMany(m => m.Stories)
                 .HasForeignKey(s => s.LanguageId)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
         }
     }
 

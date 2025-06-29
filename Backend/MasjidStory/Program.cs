@@ -29,6 +29,7 @@ namespace MasjidStory
                 options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                  .AddEntityFrameworkStores<ApplicationDbContext>();
+            builder.Services.AddSingleton<IWebHostEnvironment>(builder.Environment);
             // Repository Registeration
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             builder.Services.AddScoped(typeof(IMasjidRepository), typeof(MasjidRepository));
@@ -37,6 +38,7 @@ namespace MasjidStory
             builder.Services.AddScoped(typeof(ILikeRepository), typeof(LikeRepository));
             builder.Services.AddScoped(typeof(ICommentRepository), typeof(CommentRepository));
             builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+            builder.Services.AddScoped(typeof(IMediaRepository), typeof(MediaRepository));
 
             //Service Registeration
             builder.Services.AddScoped<AuthService>();
@@ -242,6 +244,11 @@ namespace MasjidStory
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseStaticFiles();  // enables access to /uploads/image.jpg
+            var uploadsPath = Path.Combine(app.Environment.WebRootPath, "uploads");
+            if (!Directory.Exists(uploadsPath))
+            {
+                Directory.CreateDirectory(uploadsPath);
+            }
             app.MapControllers();
 
             app.Run();

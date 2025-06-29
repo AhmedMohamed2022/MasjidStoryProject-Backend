@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace ViewModels
 {
-    // ViewModels/Masjid/MasjidCreateViewModel.cs
     public class MasjidCreateViewModel
     {
         [Required]
@@ -21,6 +21,8 @@ namespace ViewModels
         [Required]
         public int CityId { get; set; }
         public int? YearOfEstablishment { get; set; }
-    }
 
+        // Media support
+        public List<IFormFile>? MediaFiles { get; set; }
+    }
 }

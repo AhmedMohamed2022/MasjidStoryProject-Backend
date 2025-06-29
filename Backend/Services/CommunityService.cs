@@ -80,6 +80,48 @@ namespace Services
 
             return communities.Select(c => c.ToViewModel(userId)).ToList();
         }
+        public async Task<bool> UpdateCommunityAsync(int id, CommunityCreateViewModel model, string userId)
+        {
+            var community = await _repo.GetByIdAsync(id);
+            if (community == null || community.CreatedById != userId) return false;
+
+            community.Title = model.Title;
+            community.Content = model.Content;
+            community.MasjidId = model.MasjidId;
+            community.LanguageId = model.LanguageId;
+
+            _repo.Update(community);
+            await _repo.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteCommunityAsync(int id, string userId)
+        {
+            var community = await _repo.GetByIdAsync(id);
+            if (community == null || community.CreatedById != userId) return false;
+
+            // First, delete all community members
+            var members = await _memberRepo.FindAsync(m => m.CommunityId == id);
+            foreach (var member in members)
+            {
+                _memberRepo.Delete(member);
+            }
+
+            // Then delete the community
+            _repo.Delete(community);
+            await _repo.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<List<CommunityViewModel>> GetAllCommunitiesAsync()
+        {
+            var communities = await _repo.FindAsync(
+                c => true, // Get all communities
+                c => c.Language, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers
+            );
+
+            return communities.Select(c => c.ToViewModel(null)).ToList();
+        }
     }
 
 }

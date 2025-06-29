@@ -1,17 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ViewModels
+﻿namespace ViewModels
 {
     public class MediaViewModel
     {
-        public string Url { get; set; }
-        public string MediaType { get; set; }  // Image or Video
+        public int Id { get; set; }
+        public string? FileUrl { get; set; }
+        public string? FileName { get; set; }
+        public long FileSize { get; set; }
+        public string ContentType { get; set; }
+        public string? MediaType { get; set; } // Assuming MediaType is a string, adjust as necessary
+        public int? MasjidId { get; set; }
+        public int? StoryId { get; set; }
+        public DateTime UploadDate { get; set; }
     }
-
 }

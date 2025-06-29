@@ -77,6 +77,36 @@ namespace MasjidStory.Controllers
             var result = await _service.GetUserCommunitiesAsync(userId);
             return Ok(ApiResponse<List<CommunityViewModel>>.Ok(result));
         }
+        // Update community
+        [HttpPut("update/{id}")]
+        [Authorize]
+        public async Task<IActionResult> Update(int id, [FromBody] CommunityCreateViewModel model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var updated = await _service.UpdateCommunityAsync(id, model, userId);
+            if (!updated) return Forbid("Only creator can edit.");
+            return Ok(ApiResponse<string>.Ok("Community updated successfully."));
+        }
+
+        // Delete community
+        [HttpDelete("delete/{id}")]
+        [Authorize]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var deleted = await _service.DeleteCommunityAsync(id, userId);
+            if (!deleted) return Forbid("Only creator can delete.");
+            return Ok(ApiResponse<string>.Ok("Community deleted successfully."));
+        }
+
+        // Get all communities (for admin)
+        [HttpGet("all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<CommunityViewModel>>> GetAllCommunities()
+        {
+            var communities = await _service.GetAllCommunitiesAsync();
+            return Ok(ApiResponse<List<CommunityViewModel>>.Ok(communities));
+        }
     }
 
 }
