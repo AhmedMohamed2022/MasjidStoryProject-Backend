@@ -181,33 +181,43 @@ namespace MasjidStory
                 var firstName = Environment.GetEnvironmentVariable("ADMIN_FIRST_NAME") ?? "Super";
                 var lastName = Environment.GetEnvironmentVariable("ADMIN_LAST_NAME") ?? "Admin";
 
-                var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
                 if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
                 {
                     Console.WriteLine("⚠ Admin credentials are missing from environment variables");
+                    Console.WriteLine("Please set the following environment variables:");
+                    Console.WriteLine("  ADMIN_EMAIL=admin@masjidstory.com");
+                    Console.WriteLine("  ADMIN_PASSWORD=SuperSecret123!");
+                    Console.WriteLine("  JWT_KEY=your-super-secret-jwt-key-here-minimum-32-characters");
                 }
-
-                if (adminUser == null)
+                else
                 {
-                    var admin = new ApplicationUser
-                    {
-                        Email = adminEmail,
-                        UserName = adminEmail,
-                        FirstName = firstName,
-                        LastName = lastName,
-                        ProfilePictureUrl = "default.jpg"
-                    };
+                    var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-                    var result = await userManager.CreateAsync(admin, adminPassword);
-                    if (result.Succeeded)
+                    if (adminUser == null)
                     {
-                        await userManager.AddToRoleAsync(admin, "Admin");
-                        Console.WriteLine($"✔ Admin user '{adminEmail}' created and assigned to role 'Admin'");
+                        var admin = new ApplicationUser
+                        {
+                            Email = adminEmail,
+                            UserName = adminEmail,
+                            FirstName = firstName,
+                            LastName = lastName,
+                            ProfilePictureUrl = "default.jpg"
+                        };
+
+                        var result = await userManager.CreateAsync(admin, adminPassword);
+                        if (result.Succeeded)
+                        {
+                            await userManager.AddToRoleAsync(admin, "Admin");
+                            Console.WriteLine($"✔ Admin user '{adminEmail}' created and assigned to role 'Admin'");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"❌ Failed to create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                        }
                     }
                     else
                     {
-                        Console.WriteLine($"❌ Failed to create admin user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                        Console.WriteLine($"ℹ Admin user '{adminEmail}' already exists.");
                     }
                 }
                 // Seed Tags

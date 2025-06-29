@@ -69,13 +69,24 @@ namespace Services
             foreach (var role in userRoles)
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+            // Use Environment.GetEnvironmentVariable to match Program.cs
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "MasjidStoryApp";
+            var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "MasjidStoryUsers";
+
+            // Debug: Check if JWT_KEY is null or empty
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                throw new InvalidOperationException($"JWT_KEY environment variable is required but was {(jwtKey == null ? "null" : "empty")}. Please ensure environment variables are set in launchSettings.json or system environment.");
+            }
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var expires = DateTime.UtcNow.AddDays(7);
 
             var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
+                issuer: jwtIssuer,
+                audience: jwtAudience,
                 claims: claims,
                 expires: expires,
                 signingCredentials: creds

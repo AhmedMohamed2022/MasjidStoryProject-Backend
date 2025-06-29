@@ -16,7 +16,15 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5297",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "JWT_KEY": "ssDOlAHOOcMkDK0lt3CKnzOnlrfSdWxzJzEZdPRvvIs",
+        "JWT_ISSUER": "MasjidStoryApp",
+        "JWT_AUDIENCE": "MasjidStoryUsers",
+        "ADMIN_EMAIL": "admin@masjidstory.com",
+        "ADMIN_PASSWORD": "SuperSecret123!",
+        "ADMIN_FIRST_NAME": "Super",
+        "ADMIN_LAST_NAME": "Admin",
+        "DATABASE_CONNECTION_STRING": "Server=.;Database=MasjidStoryDb;Trusted_Connection=True;TrustServerCertificate=True;"
       }
     },
     "IIS Express": {
@@ -24,7 +32,15 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "JWT_KEY": "ssDOlAHOOcMkDK0lt3CKnzOnlrfSdWxzJzEZdPRvvIs",
+        "JWT_ISSUER": "MasjidStoryApp",
+        "JWT_AUDIENCE": "MasjidStoryUsers",
+        "ADMIN_EMAIL": "admin@masjidstory.com",
+        "ADMIN_PASSWORD": "SuperSecret123!",
+        "ADMIN_FIRST_NAME": "Super",
+        "ADMIN_LAST_NAME": "Admin",
+        "DATABASE_CONNECTION_STRING": "Server=.;Database=MasjidStoryDb;Trusted_Connection=True;TrustServerCertificate=True;"
       }
     }
   }
