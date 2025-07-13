@@ -374,13 +374,24 @@ namespace Repositories.Implementations
 
         public async Task<MasjidEditViewModel?> GetEditByIdAsync(int id)
         {
-            var entity = await _baseRepo.GetByIdAsync(id);
-            return entity == null ? null : new MasjidEditViewModel
+            var entity = await _context.Masjids
+                .Include(m => m.Contents)
+                .FirstOrDefaultAsync(m => m.Id == id);
+                
+            if (entity == null) return null;
+            
+            // Get the default English content or the first available content
+            var defaultLanguage = await _context.Languages.FirstOrDefaultAsync(l => l.Code == "en");
+            var content = entity.Contents?.FirstOrDefault(c => c.LanguageId == defaultLanguage?.Id) 
+                         ?? entity.Contents?.FirstOrDefault();
+            
+            return new MasjidEditViewModel
             {
                 Id = entity.Id,
                 ShortName = entity.ShortName,
                 Address = entity.Address,
                 ArchStyle = entity.ArchStyle,
+                Description = content?.Description ?? "",
                 Latitude = entity.Latitude,
                 Longitude = entity.Longitude,
                 CountryId = entity.CountryId,
@@ -404,7 +415,9 @@ namespace Repositories.Implementations
                     MasjidId = entity.Id,
                     LanguageId = defaultLanguage.Id,
                     Name = entity.ShortName,
-                    Description = entity.Address // or any default description
+                    Description = !string.IsNullOrWhiteSpace(model.Description) 
+                        ? model.Description 
+                        : $"A beautiful masjid located in {entity.Address}. This sacred place of worship serves the local Muslim community and visitors from around the world."
                 };
                 _context.MasjidContents.Add(content);
                 await _context.SaveChangesAsync();
@@ -415,11 +428,41 @@ namespace Repositories.Implementations
 
         public async Task<bool> UpdateAsync(MasjidEditViewModel model)
         {
-            var entity = await _baseRepo.GetByIdAsync(model.Id);
+            var entity = await _context.Masjids
+                .Include(m => m.Contents)
+                .FirstOrDefaultAsync(m => m.Id == model.Id);
+                
             if (entity == null) return false;
 
             model.UpdateEntity(entity);
             _baseRepo.Update(entity);
+            
+            // Update or create MasjidContent for the description
+            var defaultLanguage = await _context.Languages.FirstOrDefaultAsync(l => l.Code == "en");
+            if (defaultLanguage != null)
+            {
+                var content = entity.Contents?.FirstOrDefault(c => c.LanguageId == defaultLanguage.Id);
+                if (content != null)
+                {
+                    // Update existing content
+                    content.Name = entity.ShortName;
+                    content.Description = model.Description ?? "";
+                    _context.MasjidContents.Update(content);
+                }
+                else
+                {
+                    // Create new content
+                    var newContent = new MasjidContent
+                    {
+                        MasjidId = entity.Id,
+                        LanguageId = defaultLanguage.Id,
+                        Name = entity.ShortName,
+                        Description = model.Description ?? ""
+                    };
+                    _context.MasjidContents.Add(newContent);
+                }
+            }
+            
             await _baseRepo.SaveChangesAsync();
             return true;
         }

@@ -56,6 +56,7 @@ namespace MasjidStory
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<ContentModerationService>();
             builder.Services.AddScoped<NotificationService>();
+            builder.Services.AddScoped<FileProcessingService>();
             // Authentication
             builder.Services.AddAuthentication(options =>
             {
@@ -247,6 +248,145 @@ namespace MasjidStory
                 else
                 {
                     Console.WriteLine("ℹ Tags already exist, skipping tag seeding.");
+                }
+
+                // Seed Languages
+                var existingLanguages = dbContext.Languages.ToList();
+                var expectedLanguageCodes = new[] { "ar", "en", "fr", "tr", "fa", "ur" };
+                var existingLanguageCodes = existingLanguages.Select(l => l.Code).ToList();
+                
+                // Check if we need to add missing languages
+                var missingLanguageCodes = expectedLanguageCodes.Except(existingLanguageCodes).ToList();
+                
+                if (missingLanguageCodes.Any())
+                {
+                    Console.WriteLine("ℹ Adding missing languages...");
+                    Console.WriteLine($"Missing languages: {string.Join(", ", missingLanguageCodes)}");
+
+                    var languagesToAdd = new List<Language>();
+                    foreach (var code in missingLanguageCodes)
+                    {
+                        var languageName = code switch
+                        {
+                            "ar" => "Arabic",
+                            "en" => "English",
+                            "fr" => "French",
+                            "tr" => "Turkish",
+                            "fa" => "Persian",
+                            "ur" => "Urdu",
+                            _ => code
+                        };
+                        languagesToAdd.Add(new Language { Code = code, Name = languageName });
+                    }
+
+                    dbContext.Languages.AddRange(languagesToAdd);
+                    dbContext.SaveChanges();
+                    Console.WriteLine($"✔ Added {languagesToAdd.Count} languages successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("ℹ All languages already exist, no seeding needed.");
+                }
+
+                // Seed Countries and Cities
+                var existingCountries = dbContext.Countries.ToList();
+                var expectedCountryCodes = new[] { "EG", "SA", "AE", "QA", "KW", "BH", "OM", "JO", "LB", "SY", "IQ", "YE", "PS", "MA", "DZ", "TN", "LY", "SD", "SO", "DJ", "KM", "TD", "MR" };
+                var existingCountryCodes = existingCountries.Select(c => c.Code).ToList();
+                
+                // Check if we need to add missing countries
+                var missingCountryCodes = expectedCountryCodes.Except(existingCountryCodes).ToList();
+                
+                if (missingCountryCodes.Any())
+                {
+                    Console.WriteLine("ℹ Adding missing countries and cities...");
+                    Console.WriteLine($"Missing countries: {string.Join(", ", missingCountryCodes)}");
+
+                    // Create missing countries
+                    var countriesToAdd = new List<Country>();
+                    foreach (var code in missingCountryCodes)
+                    {
+                        var countryName = code switch
+                        {
+                            "EG" => "Egypt",
+                            "SA" => "Saudi Arabia",
+                            "AE" => "United Arab Emirates",
+                            "QA" => "Qatar",
+                            "KW" => "Kuwait",
+                            "BH" => "Bahrain",
+                            "OM" => "Oman",
+                            "JO" => "Jordan",
+                            "LB" => "Lebanon",
+                            "SY" => "Syria",
+                            "IQ" => "Iraq",
+                            "YE" => "Yemen",
+                            "PS" => "Palestine",
+                            "MA" => "Morocco",
+                            "DZ" => "Algeria",
+                            "TN" => "Tunisia",
+                            "LY" => "Libya",
+                            "SD" => "Sudan",
+                            "SO" => "Somalia",
+                            "DJ" => "Djibouti",
+                            "KM" => "Comoros",
+                            "TD" => "Chad",
+                            "MR" => "Mauritania",
+                            _ => code
+                        };
+                        countriesToAdd.Add(new Country { Code = code, Name = countryName });
+                    }
+
+                    dbContext.Countries.AddRange(countriesToAdd);
+                    dbContext.SaveChanges();
+
+                    // Get all countries (existing + newly added)
+                    var allCountries = dbContext.Countries.ToList();
+
+                    // Add cities for newly added countries
+                    var citiesToAdd = new List<City>();
+
+                    foreach (var country in countriesToAdd)
+                    {
+                        var cities = country.Code switch
+                        {
+                            "EG" => new[] { "Cairo", "Alexandria", "Giza", "Sharm El Sheikh", "Luxor", "Aswan", "Hurghada" },
+                            "SA" => new[] { "Riyadh", "Jeddah", "Mecca", "Medina", "Dammam", "Taif", "Abha" },
+                            "AE" => new[] { "Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Ras Al Khaimah", "Fujairah" },
+                            "QA" => new[] { "Doha", "Al Wakrah", "Al Khor", "Lusail" },
+                            "KW" => new[] { "Kuwait City", "Salmiya", "Hawally", "Jahra" },
+                            "BH" => new[] { "Manama", "Muharraq", "Riffa", "Hamad Town" },
+                            "OM" => new[] { "Muscat", "Salalah", "Sohar", "Nizwa" },
+                            "JO" => new[] { "Amman", "Zarqa", "Irbid", "Aqaba", "Petra" },
+                            "LB" => new[] { "Beirut", "Tripoli", "Sidon", "Tyre", "Baalbek" },
+                            "SY" => new[] { "Damascus", "Aleppo", "Homs", "Latakia", "Hama" },
+                            "IQ" => new[] { "Baghdad", "Basra", "Mosul", "Erbil", "Najaf", "Karbala", "Samarra" },
+                            "YE" => new[] { "Sana'a", "Aden", "Taiz", "Hodeidah", "Ibb" },
+                            "PS" => new[] { "Jerusalem", "Gaza", "Ramallah", "Bethlehem", "Hebron", "Nablus" },
+                            "MA" => new[] { "Casablanca", "Rabat", "Fez", "Marrakech", "Tangier", "Agadir" },
+                            "DZ" => new[] { "Algiers", "Oran", "Constantine", "Annaba", "Batna" },
+                            "TN" => new[] { "Tunis", "Sfax", "Sousse", "Kairouan", "Gabès" },
+                            "LY" => new[] { "Tripoli", "Benghazi", "Misrata", "Tobruk", "Sabha" },
+                            "SD" => new[] { "Khartoum", "Omdurman", "Port Sudan", "Kassala", "El Obeid" },
+                            "SO" => new[] { "Mogadishu", "Hargeisa", "Bosaso", "Kismayo" },
+                            "DJ" => new[] { "Djibouti City", "Ali Sabieh", "Tadjourah" },
+                            "KM" => new[] { "Moroni", "Mutsamudu", "Fomboni" },
+                            "TD" => new[] { "N'Djamena", "Moundou", "Sarh" },
+                            "MR" => new[] { "Nouakchott", "Nouadhibou", "Rosso" },
+                            _ => new string[0]
+                        };
+
+                        foreach (var cityName in cities)
+                        {
+                            citiesToAdd.Add(new City { CountryId = country.Id, Name = cityName });
+                        }
+                    }
+
+                    dbContext.Cities.AddRange(citiesToAdd);
+                    dbContext.SaveChanges();
+                    Console.WriteLine($"✔ Added {countriesToAdd.Count} countries and {citiesToAdd.Count} cities successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("ℹ All countries and cities already exist, no seeding needed.");
                 }
             }
             // Configure the HTTP request pipeline.
