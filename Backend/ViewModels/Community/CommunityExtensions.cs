@@ -18,7 +18,6 @@ namespace ViewModels
                 Title = c.Title,
                 Content = c.Content,
                 MasjidId = c.MasjidId,
-                MasjidName = c.Masjid?.ShortName ?? "Unknown",
                 LanguageCode = c.Language?.Code ?? "en",
                 CreatedByName = $"{c.CreatedBy?.FirstName} {c.CreatedBy?.LastName}",
                 DateCreated = c.DateCreated,

@@ -104,7 +104,11 @@ namespace MasjidStory.Controllers
         [Authorize]
         public async Task<ActionResult<List<CommunityViewModel>>> GetAllCommunities()
         {
-            var communities = await _service.GetAllCommunitiesAsync();
+            string? userId = User.Identity?.IsAuthenticated == true
+                ? User.FindFirstValue(ClaimTypes.NameIdentifier)
+                : null;
+
+            var communities = await _service.GetAllCommunitiesAsync(userId);
             return Ok(ApiResponse<List<CommunityViewModel>>.Ok(communities));
         }
     }

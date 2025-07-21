@@ -44,6 +44,8 @@ namespace MasjidStory.Controllers
             return Ok(ApiResponse<List<MasjidViewModel>>.Ok(result));
         }
 
+        // NOTE: The MasjidCreateViewModel and MasjidEditViewModel now expect a Contents property (per-language fields).
+        // The frontend should send a list of language-specific name/description objects.
         [Authorize(Roles = "Admin")]
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm] MasjidCreateViewModel model)

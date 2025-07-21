@@ -14,5 +14,8 @@ namespace ViewModels
         // Media management for editing
         public List<int>? MediaIdsToDelete { get; set; }  // IDs of media to update
         public List<IFormFile>? NewMediaFiles { get; set; }  // New files to upload
+
+        // Per-language content
+        public List<MasjidContentViewModel> Contents { get; set; } = new();
     }
 }

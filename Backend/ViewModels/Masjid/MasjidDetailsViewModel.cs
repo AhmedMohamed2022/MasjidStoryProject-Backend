@@ -23,6 +23,9 @@ namespace ViewModels
         public string LocalizedName { get; set; }
         public string LocalizedDescription { get; set; }
 
+        // All available language contents
+        public List<MasjidContentViewModel> Contents { get; set; } = new();
+
         // Media files
         public List<string> MediaUrls { get; set; }
 

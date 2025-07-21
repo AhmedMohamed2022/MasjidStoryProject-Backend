@@ -351,7 +351,7 @@ namespace Repositories.Implementations
         public async Task<List<MasjidViewModel>> GetFilteredAsync(string? search, int pageNumber, int pageSize)
         {
             Expression<Func<Masjid, bool>> filter = m =>
-                string.IsNullOrEmpty(search) || m.ShortName.Contains(search);
+                string.IsNullOrEmpty(search) || m.Contents.Any(c => c.Name.ToLower().Contains(search.ToLower()));
 
             var masjids = await _baseRepo.GetListWithIncludePagedAsync(
                 filter,
@@ -388,10 +388,9 @@ namespace Repositories.Implementations
             return new MasjidEditViewModel
             {
                 Id = entity.Id,
-                ShortName = entity.ShortName,
+                //ShortName = entity.ShortName,
                 Address = entity.Address,
                 ArchStyle = entity.ArchStyle,
-                Description = content?.Description ?? "",
                 Latitude = entity.Latitude,
                 Longitude = entity.Longitude,
                 CountryId = entity.CountryId,
@@ -405,25 +404,8 @@ namespace Repositories.Implementations
             var entity = model.ToEntity();
             await _baseRepo.AddAsync(entity);
             await _baseRepo.SaveChangesAsync();
-
-            // Add default MasjidContent (e.g., for English)
-            var defaultLanguage = await _context.Languages.FirstOrDefaultAsync(l => l.Code == "en");
-            if (defaultLanguage != null)
-            {
-                var content = new MasjidContent
-                {
-                    MasjidId = entity.Id,
-                    LanguageId = defaultLanguage.Id,
-                    Name = entity.ShortName,
-                    Description = !string.IsNullOrWhiteSpace(model.Description) 
-                        ? model.Description 
-                        : $"A beautiful masjid located in {entity.Address}. This sacred place of worship serves the local Muslim community and visitors from around the world."
-                };
-                _context.MasjidContents.Add(content);
-                await _context.SaveChangesAsync();
-            }
-
-            return entity.Id; // Return the created masjid ID
+            // All translations are now handled via Contents
+            return entity.Id;
         }
 
         public async Task<bool> UpdateAsync(MasjidEditViewModel model)
@@ -431,38 +413,9 @@ namespace Repositories.Implementations
             var entity = await _context.Masjids
                 .Include(m => m.Contents)
                 .FirstOrDefaultAsync(m => m.Id == model.Id);
-                
             if (entity == null) return false;
-
             model.UpdateEntity(entity);
             _baseRepo.Update(entity);
-            
-            // Update or create MasjidContent for the description
-            var defaultLanguage = await _context.Languages.FirstOrDefaultAsync(l => l.Code == "en");
-            if (defaultLanguage != null)
-            {
-                var content = entity.Contents?.FirstOrDefault(c => c.LanguageId == defaultLanguage.Id);
-                if (content != null)
-                {
-                    // Update existing content
-                    content.Name = entity.ShortName;
-                    content.Description = model.Description ?? "";
-                    _context.MasjidContents.Update(content);
-                }
-                else
-                {
-                    // Create new content
-                    var newContent = new MasjidContent
-                    {
-                        MasjidId = entity.Id,
-                        LanguageId = defaultLanguage.Id,
-                        Name = entity.ShortName,
-                        Description = model.Description ?? ""
-                    };
-                    _context.MasjidContents.Add(newContent);
-                }
-            }
-            
             await _baseRepo.SaveChangesAsync();
             return true;
         }

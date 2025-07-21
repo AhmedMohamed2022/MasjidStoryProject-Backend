@@ -16,7 +16,7 @@ namespace ViewModels
                 Title = e.Title,
                 Description = e.Description,
                 EventDate = e.EventDate,
-                MasjidName = e.Masjid?.ShortName ?? "General"
+                //MasjidName = e.Masjid?.ShortName ?? "General"
             };
         }
 
@@ -42,7 +42,6 @@ namespace ViewModels
                 Description = e.Description,
                 EventDate = e.EventDate,
                 MasjidId = e.MasjidId,
-                MasjidName = e.Masjid?.ShortName ?? "General",
                 CreatedByName = $"{e.CreatedBy?.FirstName} {e.CreatedBy?.LastName}",
                 IsUserRegistered = userId != null && e.EventAttendees?.Any(a => a.UserId == userId) == true
             };

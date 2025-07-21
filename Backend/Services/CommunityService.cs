@@ -113,14 +113,14 @@ namespace Services
             return true;
         }
 
-        public async Task<List<CommunityViewModel>> GetAllCommunitiesAsync()
+        public async Task<List<CommunityViewModel>> GetAllCommunitiesAsync(string? userId)
         {
             var communities = await _repo.FindAsync(
                 c => true, // Get all communities
                 c => c.Language, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers
             );
 
-            return communities.Select(c => c.ToViewModel(null)).ToList();
+            return communities.Select(c => c.ToViewModel(userId)).ToList();
         }
     }
 

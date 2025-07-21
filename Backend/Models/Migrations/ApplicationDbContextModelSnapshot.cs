@@ -646,11 +646,6 @@ namespace Models.Migrations
                     b.Property<decimal?>("Longitude")
                         .HasColumnType("decimal(9,6)");
 
-                    b.Property<string>("ShortName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<int?>("YearOfEstablishment")
                         .HasColumnType("int");
 

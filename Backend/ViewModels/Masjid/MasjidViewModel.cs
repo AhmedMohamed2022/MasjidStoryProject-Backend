@@ -21,6 +21,8 @@ namespace ViewModels
         public int CityId { get; set; }
         public int? YearOfEstablishment { get; set; }
         public DateTime DateOfRecord { get; set; }
+        // All available language contents
+        public List<MasjidContentViewModel> Contents { get; set; } = new();
     }
 
 }
