@@ -17,9 +17,15 @@ namespace Models.Configurations
 
             builder.HasKey(t => t.Id);
 
-            builder.Property(t => t.Name)
-                .IsRequired()
-                .HasMaxLength(100);
+            // Remove flat Name property config
+            // builder.Property(t => t.Name)
+            //     .IsRequired()
+            //     .HasMaxLength(100);
+
+            builder.HasMany(t => t.Contents)
+                .WithOne(tc => tc.Tag)
+                .HasForeignKey(tc => tc.TagId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 

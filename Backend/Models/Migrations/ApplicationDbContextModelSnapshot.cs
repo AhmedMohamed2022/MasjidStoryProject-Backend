@@ -482,26 +482,14 @@ namespace Models.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("EventDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<int?>("LanguageId")
                         .HasColumnType("int");
 
                     b.Property<int?>("MasjidId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
@@ -530,6 +518,38 @@ namespace Models.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("EventParticipants", (string)null);
+                });
+
+            modelBuilder.Entity("Models.Entities.EventContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("EventContents", (string)null);
                 });
 
             modelBuilder.Entity("Models.Entities.Language", b =>
@@ -909,10 +929,6 @@ namespace Models.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("DatePublished")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -929,11 +945,6 @@ namespace Models.Migrations
                     b.Property<int>("MasjidId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
@@ -943,6 +954,38 @@ namespace Models.Migrations
                     b.HasIndex("MasjidId");
 
                     b.ToTable("Stories", (string)null);
+                });
+
+            modelBuilder.Entity("Models.Entities.StoryContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LanguageId");
+
+                    b.HasIndex("StoryId");
+
+                    b.ToTable("StoryContents", (string)null);
                 });
 
             modelBuilder.Entity("Models.Entities.StoryTag", b =>
@@ -968,14 +1011,37 @@ namespace Models.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.HasKey("Id");
+
+                    b.ToTable("Tags", (string)null);
+                });
+
+            modelBuilder.Entity("Models.Entities.TagContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("TagId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Tags", (string)null);
+                    b.HasIndex("LanguageId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("TagContents", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1134,18 +1200,16 @@ namespace Models.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Models.Entities.Language", "Language")
+                    b.HasOne("Models.Entities.Language", null)
                         .WithMany("Events")
                         .HasForeignKey("LanguageId");
 
                     b.HasOne("Models.Entities.Masjid", "Masjid")
                         .WithMany("Events")
                         .HasForeignKey("MasjidId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("CreatedBy");
-
-                    b.Navigation("Language");
 
                     b.Navigation("Masjid");
                 });
@@ -1167,6 +1231,25 @@ namespace Models.Migrations
                     b.Navigation("Event");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Models.Entities.EventContent", b =>
+                {
+                    b.HasOne("Models.Entities.Event", "Event")
+                        .WithMany("Contents")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Models.Entities.Like", b =>
@@ -1300,10 +1383,9 @@ namespace Models.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Models.Entities.Language", "Language")
+                    b.HasOne("Models.Entities.Language", null)
                         .WithMany("Stories")
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("LanguageId");
 
                     b.HasOne("Models.Entities.Masjid", "Masjid")
                         .WithMany("Stories")
@@ -1313,9 +1395,26 @@ namespace Models.Migrations
 
                     b.Navigation("ApplicationUser");
 
+                    b.Navigation("Masjid");
+                });
+
+            modelBuilder.Entity("Models.Entities.StoryContent", b =>
+                {
+                    b.HasOne("Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Models.Entities.Story", "Story")
+                        .WithMany("Contents")
+                        .HasForeignKey("StoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Language");
 
-                    b.Navigation("Masjid");
+                    b.Navigation("Story");
                 });
 
             modelBuilder.Entity("Models.Entities.StoryTag", b =>
@@ -1333,6 +1432,25 @@ namespace Models.Migrations
                         .IsRequired();
 
                     b.Navigation("Story");
+
+                    b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("Models.Entities.TagContent", b =>
+                {
+                    b.HasOne("Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Models.Entities.Tag", "Tag")
+                        .WithMany("Contents")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Language");
 
                     b.Navigation("Tag");
                 });
@@ -1381,6 +1499,8 @@ namespace Models.Migrations
 
             modelBuilder.Entity("Models.Entities.Event", b =>
                 {
+                    b.Navigation("Contents");
+
                     b.Navigation("EventAttendees");
                 });
 
@@ -1414,6 +1534,8 @@ namespace Models.Migrations
                 {
                     b.Navigation("Comments");
 
+                    b.Navigation("Contents");
+
                     b.Navigation("Likes");
 
                     b.Navigation("MediaItems");
@@ -1423,6 +1545,8 @@ namespace Models.Migrations
 
             modelBuilder.Entity("Models.Entities.Tag", b =>
                 {
+                    b.Navigation("Contents");
+
                     b.Navigation("StoryTags");
                 });
 #pragma warning restore 612, 618

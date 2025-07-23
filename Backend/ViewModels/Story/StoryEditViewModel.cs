@@ -12,29 +12,16 @@ namespace ViewModels
     {
         [Required]
         public int Id { get; set; }
-
-        [Required]
-        public string Title { get; set; }
-
-        [Required]
-        public string Content { get; set; }
-
         [Required]
         public int MasjidId { get; set; }
-
-        public int? LanguageId { get; set; }
-
+        public List<StoryContentViewModel> Contents { get; set; } = new();
         public bool IsApproved { get; set; }
-        
         // New images to upload
         public List<IFormFile>? NewStoryImages { get; set; }
-        
         // Media IDs to keep (all other media will be deleted)
         public List<int>? KeepMediaIds { get; set; }
-        
         // Media IDs to specifically remove
         public List<int>? RemoveMediaIds { get; set; }
-
         // Content change tracking
         public string? OriginalTitle { get; set; }
         public string? OriginalContent { get; set; }

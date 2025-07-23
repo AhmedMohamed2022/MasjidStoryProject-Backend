@@ -9,15 +9,13 @@ namespace ViewModels
     public class StoryViewModel
     {
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
+        public string LocalizedTitle { get; set; }
+        public string LocalizedContent { get; set; }
         public DateTime DatePublished { get; set; }
         public bool IsApproved { get; set; }
 
         public string MasjidName { get; set; }
         public string AuthorFullName { get; set; }
-        public string LanguageCode { get; set; }
-
         public int LikeCount { get; set; }
         public bool IsLikedByCurrentUser { get; set; }
 
@@ -25,7 +23,7 @@ namespace ViewModels
         public List<string> Tags { get; set; } = new List<string>();
         public List<string> ImageUrls { get; set; } = new();
         public List<MediaViewModel> MediaItems { get; set; } = new();
-
+        public List<StoryContentViewModel> Contents { get; set; } = new();
     }
 
 }

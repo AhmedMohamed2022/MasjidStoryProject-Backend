@@ -17,26 +17,23 @@ namespace Models.Configurations
 
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.Title)
-                .IsRequired()
-                .HasMaxLength(200);
-
-            builder.Property(e => e.Description)
-                .IsRequired();
-
             builder.Property(e => e.EventDate)
                 .IsRequired();
+
+            builder.HasMany(e => e.Contents)
+                .WithOne(c => c.Event)
+                .HasForeignKey(c => c.EventId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(e => e.Masjid)
                 .WithMany(m => m.Events)
                 .HasForeignKey(e => e.MasjidId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasOne(e => e.CreatedBy)
-                .WithMany(ep => ep.EventsCreated)
-                .HasForeignKey(ep => ep.CreatedById)
+                .WithMany(u => u.EventsCreated)
+                .HasForeignKey(e => e.CreatedById)
                 .OnDelete(DeleteBehavior.Restrict);
-
         }
     }
 }

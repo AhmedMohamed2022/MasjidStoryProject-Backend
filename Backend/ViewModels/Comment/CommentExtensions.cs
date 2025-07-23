@@ -18,7 +18,7 @@ namespace ViewModels
                 ContentId = entity.ContentId,
                 ContentType = entity.ContentType,
                 StoryId = entity.StoryId ?? 0, // Handle nullable StoryId
-                StoryTitle = entity.Story?.Title,
+                StoryTitle = entity.Story?.Contents?.FirstOrDefault()?.Title,
                 UserId = entity.UserId,
                 UserName = entity.Author?.UserName,
                 Content = entity.Content,

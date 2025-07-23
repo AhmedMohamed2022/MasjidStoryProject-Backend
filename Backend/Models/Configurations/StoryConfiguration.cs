@@ -17,13 +17,6 @@ namespace Models.Configurations
 
             builder.HasKey(s => s.Id);
 
-            builder.Property(s => s.Title)
-                .IsRequired()
-                .HasMaxLength(255);
-
-            builder.Property(s => s.Content)
-                .IsRequired();
-
             builder.Property(s => s.DatePublished)
                 .HasDefaultValueSql("GETDATE()");
 
@@ -40,11 +33,11 @@ namespace Models.Configurations
                 .HasForeignKey(s => s.MasjidId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(s => s.Language)
-                .WithMany(m => m.Stories)
-                .HasForeignKey(s => s.LanguageId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            // Add Contents relationship
+            builder.HasMany(s => s.Contents)
+                .WithOne(sc => sc.Story)
+                .HasForeignKey(sc => sc.StoryId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 

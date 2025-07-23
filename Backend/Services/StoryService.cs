@@ -45,24 +45,23 @@ namespace Services
 
         //    await _repository.AddStoryAsync(model, userId, imageUrls);
         //}
-        public async Task<int> AddStoryAsync(StoryCreateViewModel model,string userId)
+        public async Task<int> AddStoryAsync(StoryCreateViewModel model, string userId)
         {
-            var storyId = await _repository.AddStoryAsync(model,userId);
-            
-            // Create notification for admins about new pending story
-            await CreateNewStoryNotificationAsync(storyId, model.Title, userId);
-            
+            var storyId = await _repository.AddStoryAsync(model, userId);
+            // Use the first translation for notification
+            var firstTitle = model.Contents?.FirstOrDefault()?.Title ?? "Story";
+            await CreateNewStoryNotificationAsync(storyId, firstTitle, userId);
             return storyId;
         }
 
-        public async Task<List<StoryViewModel>> GetAllStoriesAsync()
+        public async Task<List<StoryViewModel>> GetAllStoriesAsync(string languageCode = "en")
         {
-            return await _repository.GetAllAsync();
+            return await _repository.GetAllAsync(languageCode);
         }
 
-        public async Task<StoryViewModel?> GetStoryByIdAsync(int id, string? userId = null)
+        public async Task<StoryViewModel?> GetStoryByIdAsync(int id, string? userId = null, string languageCode = "en")
         {
-            return await _repository.GetByIdAsync(id, userId);
+            return await _repository.GetByIdAsync(id, userId, languageCode);
         }
 
 
@@ -76,9 +75,9 @@ namespace Services
             return await _repository.DeleteAsync(id);
         }
         
-        public async Task<List<StoryViewModel>> GetPendingStoriesAsync()
+        public async Task<List<StoryViewModel>> GetPendingStoriesAsync(string languageCode = "en")
         {
-            return await _repository.GetPendingAsync();
+            return await _repository.GetPendingAsync(languageCode);
         }
 
         public async Task<bool> ApproveStoryAsync(int id)
@@ -93,23 +92,23 @@ namespace Services
             
             return result;
         }
-        public async Task<List<StoryViewModel>> GetLatestStoriesAsync()
+        public async Task<List<StoryViewModel>> GetLatestStoriesAsync(string languageCode = "en")
         {
-            var stories = await _repository.GetLatestApprovedStoriesAsync(6);
+            var stories = await _repository.GetLatestApprovedStoriesAsync(6, languageCode);
             return stories;
         }
-        public async Task<List<StoryViewModel>> GetRelatedStoriesAsync(int storyId)
+        public async Task<List<StoryViewModel>> GetRelatedStoriesAsync(int storyId, string languageCode = "en")
         {
-            return await _repository.GetRelatedStoriesAsync(storyId);
+            return await _repository.GetRelatedStoriesAsync(storyId, languageCode);
         }
-        public async Task<List<StoryViewModel>> GetStoriesByUserIdAsync(string userId)
+        public async Task<List<StoryViewModel>> GetStoriesByUserIdAsync(string userId, string languageCode = "en")
         {
-            return await _repository.GetStoriesByUserIdAsync(userId);
+            return await _repository.GetStoriesByUserIdAsync(userId, languageCode);
         }
 
-        public async Task<PaginatedResponse<StoryViewModel>> GetStoriesPaginatedAsync(int page, int size)
+        public async Task<PaginatedResponse<StoryViewModel>> GetStoriesPaginatedAsync(int page, int size, string languageCode = "en")
         {
-            return await _repository.GetPaginatedAsync(page, size);
+            return await _repository.GetPaginatedAsync(page, size, languageCode);
         }
 
         // Helper methods for notifications
@@ -153,15 +152,17 @@ namespace Services
             {
                 // Get the story details
                 var story = await _context.Stories
+                    .Include(s => s.Contents)
                     .FirstOrDefaultAsync(s => s.Id == storyId);
 
                 if (story != null && !string.IsNullOrEmpty(story.ApplicationUserId))
                 {
+                    var firstTitle = story.Contents?.FirstOrDefault()?.Title ?? "Story";
                     await _notificationService.CreateNotificationAsync(new NotificationCreateViewModel
                     {
                         UserId = story.ApplicationUserId,
                         Title = "Story Approved",
-                        Message = $"Your story '{story.Title}' has been approved and is now live!",
+                        Message = $"Your story '{firstTitle}' has been approved and is now live!",
                         Type = "Approval",
                         ContentType = "Story",
                         ContentId = storyId,

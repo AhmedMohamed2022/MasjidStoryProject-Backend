@@ -21,34 +21,46 @@ namespace Services
                 RequiresReapproval = false
             };
 
-            // Check title changes
-            if (!string.Equals(editModel.Title?.Trim(), originalStory.Title?.Trim(), StringComparison.OrdinalIgnoreCase))
+            // Compare all translations
+            foreach (var editContent in editModel.Contents)
             {
-                analysis.HasSignificantChanges = true;
-                analysis.ChangeReason.Add("Title modified");
+                var origContent = originalStory.Contents?.FirstOrDefault(c => c.LanguageId == editContent.LanguageId);
+                if (origContent == null)
+                {
+                    analysis.HasSignificantChanges = true;
+                    analysis.ChangeReason.Add($"Added translation for language {editContent.LanguageId}");
+                    continue;
+                }
+                if (!string.Equals(editContent.Title?.Trim(), origContent.Title?.Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    analysis.HasSignificantChanges = true;
+                    analysis.ChangeReason.Add($"Title modified for language {editContent.LanguageId}");
+                }
+                var contentChange = AnalyzeContentChange(origContent.Content, editContent.Content);
+                if (contentChange.IsSignificant)
+                {
+                    analysis.HasSignificantChanges = true;
+                    analysis.ChangeReason.Add($"Content {contentChange.ChangeType} for language {editContent.LanguageId}");
+                }
             }
-
-            // Check content changes
-            var contentChange = AnalyzeContentChange(originalStory.Content, editModel.Content);
-            if (contentChange.IsSignificant)
+            // Check for removed translations
+            foreach (var origContent in originalStory.Contents)
             {
-                analysis.HasSignificantChanges = true;
-                analysis.ChangeReason.Add($"Content {contentChange.ChangeType}");
+                if (!editModel.Contents.Any(c => c.LanguageId == origContent.LanguageId))
+                {
+                    analysis.HasSignificantChanges = true;
+                    analysis.ChangeReason.Add($"Removed translation for language {origContent.LanguageId}");
+                }
             }
-
-            // Check image changes
+            // Check image changes (unchanged)
             var originalImageCount = originalStory.MediaItems?.Count ?? 0;
             var newImageCount = (editModel.NewStoryImages?.Count ?? 0) + (editModel.KeepMediaIds?.Count ?? 0);
-            
             if (Math.Abs(originalImageCount - newImageCount) > 0)
             {
                 analysis.HasSignificantChanges = true;
                 analysis.ChangeReason.Add("Images modified");
             }
-
-            // Determine if re-approval is required
             analysis.RequiresReapproval = analysis.HasSignificantChanges;
-
             return analysis;
         }
 

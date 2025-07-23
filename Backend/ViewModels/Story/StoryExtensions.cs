@@ -4,23 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Models.Entities;
+using ViewModels;
 namespace ViewModels
 {
     public static class StoryExtensions
     {
-        public static StoryViewModel ToViewModel(this Story entity, string? currentUserId = null)
+        public static StoryViewModel ToViewModel(this Story entity, string? currentUserId = null, string languageCode = "en")
         {
+            var content = entity.Contents?.FirstOrDefault(c => c.Language != null && c.Language.Code == languageCode)
+                ?? entity.Contents?.FirstOrDefault();
             return new StoryViewModel
             {
                 Id = entity.Id,
-                Title = entity.Title,
-                Content = entity.Content,
+                LocalizedTitle = content?.Title ?? string.Empty,
+                LocalizedContent = content?.Content ?? string.Empty,
                 DatePublished = entity.DatePublished,
                 IsApproved = entity.IsApproved,
                 MasjidName = entity.Masjid?.Contents?.FirstOrDefault()?.Name ?? "Unknown",
                 AuthorFullName = $"{entity.ApplicationUser?.FirstName} {entity.ApplicationUser?.LastName}",
-                LanguageCode = entity.Language?.Code ?? "en",
                 LikeCount = entity.Likes?.Count ?? 0,
                 IsLikedByCurrentUser = currentUserId != null && entity.Likes?.Any(l => l.UserId == currentUserId) == true,
                 Comments = entity.Comments?
@@ -28,18 +30,31 @@ namespace ViewModels
                     .OrderByDescending(c => c.DatePosted)
                     .Select(c => c.ToViewModel())
                     .ToList() ?? new(),
-                Tags = entity.StoryTags?.Select(st => st.Tag.Name).ToList() ?? new(),
+                Tags = entity.StoryTags?.Select(st =>
+                {
+                    var tagContent = st.Tag.Contents?.FirstOrDefault(tc => tc.Language != null && tc.Language.Code == languageCode)
+                        ?? st.Tag.Contents?.FirstOrDefault();
+                    return tagContent?.Name ?? "";
+                }).ToList() ?? new(),
                 ImageUrls = entity.MediaItems?.Select(m => m.FileUrl).ToList() ?? new(),
-                MediaItems = entity.MediaItems?.Select(m => m.ToViewModel()).ToList() ?? new()
+                MediaItems = entity.MediaItems?.Select(m => m.ToViewModel()).ToList() ?? new(),
+                Contents = entity.Contents?.Select(c => new StoryContentViewModel
+                {
+                    LanguageId = c.LanguageId,
+                    Title = c.Title,
+                    Content = c.Content
+                }).ToList() ?? new()
             };
         }
 
-        public static StorySummaryViewModel ToSummaryViewModel(this Story entity)
+        public static StorySummaryViewModel ToSummaryViewModel(this Story entity, string languageCode = "en")
         {
+            var content = entity.Contents?.FirstOrDefault(c => c.Language != null && c.Language.Code == languageCode)
+                ?? entity.Contents?.FirstOrDefault();
             return new StorySummaryViewModel
             {
                 Id = entity.Id,
-                Title = entity.Title,
+                LocalizedTitle = content?.Title ?? string.Empty,
                 AuthorName = $"{entity.ApplicationUser?.FirstName} {entity.ApplicationUser?.LastName}",
                 DatePublished = entity.DatePublished,
                 LikeCount = entity.Likes?.Count ?? 0,
@@ -52,36 +67,52 @@ namespace ViewModels
         {
             return new Story
             {
-                Title = model.Title,
-                Content = model.Content,
                 MasjidId = model.MasjidId,
-                LanguageId = model.LanguageId,
                 ApplicationUserId = userId,
                 DatePublished = DateTime.UtcNow,
-                IsApproved = false
+                IsApproved = false,
+                Contents = model.Contents?.Select(c => new StoryContent
+                {
+                    LanguageId = c.LanguageId,
+                    Title = c.Title,
+                    Content = c.Content
+                }).ToList() ?? new()
             };
         }
         public static Story ToEntity(this StoryCreateViewModel model)
         {
             return new Story
             {
-                Title = model.Title,
-                Content = model.Content,
                 MasjidId = model.MasjidId,
-                LanguageId = model.LanguageId,
                 DatePublished = DateTime.UtcNow,
-                IsApproved = false
+                IsApproved = false,
+                Contents = model.Contents?.Select(c => new StoryContent
+                {
+                    LanguageId = c.LanguageId,
+                    Title = c.Title,
+                    Content = c.Content
+                }).ToList() ?? new()
             };
         }
 
         public static void UpdateEntity(this StoryEditViewModel model, Story entity)
         {
-            entity.Title = model.Title;
-            entity.Content = model.Content;
             entity.MasjidId = model.MasjidId;
-            entity.LanguageId = model.LanguageId;
             entity.IsApproved = model.IsApproved;
-            
+            // Update translations
+            if (model.Contents != null)
+            {
+                entity.Contents.Clear();
+                foreach (var c in model.Contents)
+                {
+                    entity.Contents.Add(new StoryContent
+                    {
+                        LanguageId = c.LanguageId,
+                        Title = c.Title,
+                        Content = c.Content
+                    });
+                }
+            }
             // Add audit trail information (you might want to add these fields to the Story entity)
             // entity.LastModified = DateTime.UtcNow;
             // entity.RequiresReapproval = model.RequiresReapproval;

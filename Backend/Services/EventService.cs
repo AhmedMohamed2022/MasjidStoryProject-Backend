@@ -20,17 +20,19 @@ namespace Services
             _attendeeRepo = attendeeRepo;
         }
 
-        public async Task<List<EventViewModel>> GetUpcomingEventsAsync()
+        public async Task<List<EventViewModel>> GetUpcomingEventsAsync(string languageCode = "en")
         {
             var events = await _baseRepo.FindAsync(
                 e => e.EventDate >= DateTime.UtcNow,
-                e => e.Masjid
+                e => e.Masjid,
+                e => e.CreatedBy,
+                e => e.Contents
             );
 
             return events
                 .OrderBy(e => e.EventDate)
                 .Take(6)
-                .Select(e => e.ToViewModel())
+                .Select(e => e.ToViewModel(languageCode))
                 .ToList();
         }
 
@@ -59,29 +61,32 @@ namespace Services
             await _attendeeRepo.SaveChangesAsync();
             return true;
         }
-        public async Task<EventViewModel?> GetEventDetailsAsync(int id, string? userId)
+        public async Task<EventViewModel?> GetEventDetailsAsync(int id, string? userId, string languageCode = "en")
         {
             var ev = await _baseRepo.GetFirstOrDefaultAsync(
                 e => e.Id == id,
                 e => e.Masjid,
                 e => e.CreatedBy,
-                e => e.EventAttendees
+                e => e.EventAttendees,
+                e => e.Contents
             );
 
-            return ev?.ToViewModel(userId);
+            return ev?.ToViewModel(userId, languageCode);
         }
 
-        public async Task<List<EventViewModel>> GetMasjidEventsAsync(int masjidId)
+        public async Task<List<EventViewModel>> GetMasjidEventsAsync(int masjidId, string languageCode = "en")
         {
             var events = await _baseRepo.FindAsync(
                 e => e.MasjidId == masjidId && e.EventDate >= DateTime.UtcNow,
-                e => e.Masjid
+                e => e.Masjid,
+                e => e.CreatedBy,
+                e => e.Contents
             );
 
-            return events.Select(e => e.ToViewModel()).ToList();
+            return events.Select(e => e.ToViewModel(languageCode)).ToList();
         }
 
-        public async Task<List<EventViewModel>> GetUserRegisteredEventsAsync(string userId)
+        public async Task<List<EventViewModel>> GetUserRegisteredEventsAsync(string userId, string languageCode = "en")
         {
             var attendeeRecords = await _attendeeRepo.FindAsync(a => a.UserId == userId, a => a.Event);
 
@@ -91,7 +96,17 @@ namespace Services
                 .Distinct()
                 .ToList();
 
-            return events.Select(e => e.ToViewModel(userId)).ToList();
+            // Load CreatedBy for each event
+            foreach (var ev in events)
+            {
+                if (ev.CreatedById != null)
+                {
+                    // Load the CreatedBy navigation property
+                    await _baseRepo.GetFirstOrDefaultAsync(e => e.Id == ev.Id, e => e.CreatedBy);
+                }
+            }
+
+            return events.Select(e => e.ToViewModel(userId, languageCode)).ToList();
         }
 
         public async Task<bool> UpdateEventAsync(int id, EventCreateViewModel model, string userId)
@@ -99,10 +114,18 @@ namespace Services
             var entity = await _baseRepo.GetByIdAsync(id);
             if (entity == null || (entity.CreatedById != userId)) return false;
 
-            entity.Title = model.Title;
-            entity.Description = model.Description;
+            // Remove old contents and add new ones
+            entity.Contents?.Clear();
+            if (model.Contents != null)
+            {
+                entity.Contents = model.Contents.Select(c => new EventContent
+                {
+                    LanguageId = c.LanguageId,
+                    Title = c.Title,
+                    Description = c.Description
+                }).ToList();
+            }
             entity.EventDate = model.EventDate;
-            entity.LanguageId = model.LanguageId;
             entity.MasjidId = model.MasjidId;
 
             _baseRepo.Update(entity);

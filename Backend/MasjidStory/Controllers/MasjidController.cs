@@ -23,9 +23,9 @@ namespace MasjidStory.Controllers
         }
 
         [HttpGet("getAll")]
-        public async Task<ActionResult<List<MasjidViewModel>>> GetAll()
+        public async Task<ActionResult<List<MasjidViewModel>>> GetAll([FromQuery] string languageCode = "en")
         {
-            var masjids = await _service.GetAllMasjidsAsync();
+            var masjids = await _service.GetAllMasjidsAsync(languageCode);
             return Ok(ApiResponse<List<MasjidViewModel>>.Ok(masjids));
         }
 

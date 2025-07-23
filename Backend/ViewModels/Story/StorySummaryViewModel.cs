@@ -9,7 +9,7 @@ namespace ViewModels
     public class StorySummaryViewModel
     {
         public int Id { get; set; }
-        public string Title { get; set; }
+        public string LocalizedTitle { get; set; }
         public string AuthorName { get; set; }
         public DateTime DatePublished { get; set; }
         public int LikeCount { get; set; }

@@ -97,6 +97,7 @@ namespace Services
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 Email = user.Email,
                 FullName = $"{user.FirstName} {user.LastName}",
+                UserId = user.Id,
                 Roles = userRoles.ToList()
             };
         }

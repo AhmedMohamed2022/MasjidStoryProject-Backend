@@ -23,6 +23,7 @@ namespace ViewModels
         public DateTime DateOfRecord { get; set; }
         // All available language contents
         public List<MasjidContentViewModel> Contents { get; set; } = new();
+        public string LocalizedName { get; set; }
     }
 
 }

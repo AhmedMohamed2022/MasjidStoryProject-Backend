@@ -23,41 +23,41 @@ namespace MasjidStory.Controllers
 
         // GET: api/story/all
         [HttpGet("all")]
-        public async Task<ActionResult<List<StoryViewModel>>> GetAll()
+        public async Task<ActionResult<List<StoryViewModel>>> GetAll([FromQuery] string languageCode = "en")
         {
-            var stories = await _service.GetAllStoriesAsync();
+            var stories = await _service.GetAllStoriesAsync(languageCode);
             return Ok(stories);
         }
 
         // GET: api/story/paginated
         [HttpGet("paginated")]
-        public async Task<ActionResult<PaginatedResponse<StoryViewModel>>> GetPaginated([FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<ActionResult<PaginatedResponse<StoryViewModel>>> GetPaginated([FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string languageCode = "en")
         {
-            var result = await _service.GetStoriesPaginatedAsync(page, size);
+            var result = await _service.GetStoriesPaginatedAsync(page, size, languageCode);
             return Ok(result);
         }
 
         // GET: api/story/my-stories
         [HttpGet("my-stories")]
         [Authorize]
-        public async Task<ActionResult<List<StoryViewModel>>> GetMyStories()
+        public async Task<ActionResult<List<StoryViewModel>>> GetMyStories([FromQuery] string languageCode = "en")
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null) return Unauthorized();
 
-            var stories = await _service.GetStoriesByUserIdAsync(userId);
+            var stories = await _service.GetStoriesByUserIdAsync(userId, languageCode);
             return Ok(stories);
         }
 
         // GET: api/story/details/{id}
         [HttpGet("details/{id}")]
-        public async Task<ActionResult<StoryViewModel>> GetById(int id)
+        public async Task<ActionResult<StoryViewModel>> GetById(int id, [FromQuery] string languageCode = "en")
         {
             string? userId = User.Identity?.IsAuthenticated == true
                 ? User.FindFirstValue(ClaimTypes.NameIdentifier)
                 : null;
 
-            var story = await _service.GetStoryByIdAsync(id, userId);
+            var story = await _service.GetStoryByIdAsync(id, userId, languageCode);
             if (story == null)
                 return NotFound();
 
@@ -119,8 +119,8 @@ namespace MasjidStory.Controllers
                 var contentAnalysis = _contentModerationService.AnalyzeContentChanges(model, currentStory);
                 
                 // Set the original content for tracking
-                model.OriginalTitle = currentStory.Title;
-                model.OriginalContent = currentStory.Content;
+                model.OriginalTitle = currentStory.Contents?.FirstOrDefault()?.Title;
+                model.OriginalContent = currentStory.Contents?.FirstOrDefault()?.Content;
                 model.RequiresReapproval = contentAnalysis.RequiresReapproval;
                 model.ChangeReason = string.Join(", ", contentAnalysis.ChangeReason);
 
@@ -203,9 +203,9 @@ namespace MasjidStory.Controllers
         // GET: api/story/pending
         [HttpGet("pending")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<StoryViewModel>>> GetPendingApproval()
+        public async Task<ActionResult<List<StoryViewModel>>> GetPendingApproval([FromQuery] string languageCode = "en")
         {
-            var stories = await _service.GetPendingStoriesAsync();
+            var stories = await _service.GetPendingStoriesAsync(languageCode);
             return Ok(stories);
         }
 
@@ -222,17 +222,17 @@ namespace MasjidStory.Controllers
 
         // GET: api/story/latest
         [HttpGet("latest")]
-        public async Task<ActionResult<List<StoryViewModel>>> GetLatestStories()
+        public async Task<ActionResult<List<StoryViewModel>>> GetLatestStories([FromQuery] string languageCode = "en")
         {
-            var stories = await _service.GetLatestStoriesAsync();
+            var stories = await _service.GetLatestStoriesAsync(languageCode);
             return Ok(ApiResponse<List<StoryViewModel>>.Ok(stories));
         }
 
         // GET: api/story/related/{storyId}
         [HttpGet("related/{storyId}")]
-        public async Task<ActionResult<List<StoryViewModel>>> GetRelatedStories(int storyId)
+        public async Task<ActionResult<List<StoryViewModel>>> GetRelatedStories(int storyId, [FromQuery] string languageCode = "en")
         {
-            var relatedStories = await _service.GetRelatedStoriesAsync(storyId);
+            var relatedStories = await _service.GetRelatedStoriesAsync(storyId, languageCode);
             return Ok(ApiResponse<List<StoryViewModel>>.Ok(relatedStories));
         }
 

@@ -1,0 +1,86 @@
+[
+  {
+    "key": "history",
+    "translations": [
+      { "languageCode": "en", "name": "History" },
+      { "languageCode": "ar", "name": "تاريخ" }
+    ]
+  },
+  {
+    "key": "architecture",
+    "translations": [
+      { "languageCode": "en", "name": "Architecture" },
+      { "languageCode": "ar", "name": "عمارة" }
+    ]
+  },
+  {
+    "key": "community",
+    "translations": [
+      { "languageCode": "en", "name": "Community" },
+      { "languageCode": "ar", "name": "مجتمع" }
+    ]
+  },
+  {
+    "key": "charity",
+    "translations": [
+      { "languageCode": "en", "name": "Charity" },
+      { "languageCode": "ar", "name": "صدقة" }
+    ]
+  },
+  {
+    "key": "education",
+    "translations": [
+      { "languageCode": "en", "name": "Education" },
+      { "languageCode": "ar", "name": "تعليم" }
+    ]
+  },
+  {
+    "key": "event",
+    "translations": [
+      { "languageCode": "en", "name": "Event" },
+      { "languageCode": "ar", "name": "فعالية" }
+    ]
+  },
+  {
+    "key": "prayer",
+    "translations": [
+      { "languageCode": "en", "name": "Prayer" },
+      { "languageCode": "ar", "name": "صلاة" }
+    ]
+  },
+  {
+    "key": "youth",
+    "translations": [
+      { "languageCode": "en", "name": "Youth" },
+      { "languageCode": "ar", "name": "شباب" }
+    ]
+  },
+  {
+    "key": "women",
+    "translations": [
+      { "languageCode": "en", "name": "Women" },
+      { "languageCode": "ar", "name": "نساء" }
+    ]
+  },
+  {
+    "key": "ramadan",
+    "translations": [
+      { "languageCode": "en", "name": "Ramadan" },
+      { "languageCode": "ar", "name": "رمضان" }
+    ]
+  },
+  {
+    "key": "lecture",
+    "translations": [
+      { "languageCode": "en", "name": "Lecture" },
+      { "languageCode": "ar", "name": "محاضرة" }
+    ]
+  },
+  {
+    "key": "fundraising",
+    "translations": [
+      { "languageCode": "en", "name": "Fundraising" },
+      { "languageCode": "ar", "name": "جمع تبرعات" }
+    ]
+  }
+]

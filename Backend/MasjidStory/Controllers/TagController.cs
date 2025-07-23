@@ -17,10 +17,22 @@ namespace MasjidStory.Controllers
 
         // GET: api/tag/all
         [HttpGet("all")]
-        public async Task<ActionResult<List<string>>> GetAllTags()
+        public async Task<ActionResult<List<object>>> GetAllTags([FromQuery] string languageCode = "en")
         {
             var tags = await _tagRepo.FindAsync(t => true);
-            return Ok(tags.Select(t => t.Name).ToList());
+            var tagObjects = tags.Select(t =>
+            {
+                var content = t.Contents?.FirstOrDefault(tc => tc.Language != null && tc.Language.Code == languageCode)
+                    ?? t.Contents?.FirstOrDefault(tc => tc.Language != null && tc.Language.Code == "en")
+                    ?? t.Contents?.FirstOrDefault();
+                return new {
+                    id = t.Id,
+                    localizedName = content?.Name ?? ""
+                };
+            })
+            .Where(t => !string.IsNullOrWhiteSpace(t.localizedName))
+            .ToList();
+            return Ok(tagObjects);
         }
     }
 }

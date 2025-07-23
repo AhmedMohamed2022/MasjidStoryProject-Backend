@@ -11,8 +11,13 @@ namespace ViewModels
     // ViewModels/Masjid/MasjidExtensions.cs
     public static class MasjidExtensions
     {
-        public static MasjidViewModel ToViewModel(this Masjid masjid)
+        public static MasjidViewModel ToViewModel(this Masjid masjid, string languageCode = "en")
         {
+            int langId = languageCode.ToLower() == "ar" ? 2 : 1;
+            var localizedName = masjid.Contents?.FirstOrDefault(c => c.LanguageId == langId)?.Name
+                ?? masjid.Contents?.FirstOrDefault(c => c.LanguageId == 1)?.Name // English fallback
+                ?? masjid.Contents?.FirstOrDefault()?.Name
+                ?? string.Empty;
             return new MasjidViewModel
             {
                 Id = masjid.Id,
@@ -30,7 +35,8 @@ namespace ViewModels
                     LanguageId = c.LanguageId,
                     Name = c.Name,
                     Description = c.Description
-                }).ToList() ?? new List<MasjidContentViewModel>()
+                }).ToList() ?? new List<MasjidContentViewModel>(),
+                LocalizedName = localizedName
             };
         }
 
@@ -101,7 +107,7 @@ namespace ViewModels
                     .Select(s => new StorySummaryViewModel
                     {
                         Id = s.Id,
-                        Title = s.Title,
+                        LocalizedTitle = s.Contents?.FirstOrDefault()?.Title ?? string.Empty,
                         AuthorName = $"{s.ApplicationUser.FirstName} {s.ApplicationUser.LastName}",
                         DatePublished = s.DatePublished,
                         LikeCount = s.Likes?.Count ?? 0,

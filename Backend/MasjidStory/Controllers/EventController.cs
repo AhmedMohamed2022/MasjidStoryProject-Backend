@@ -18,9 +18,9 @@ namespace MasjidStory.Controllers
         }
 
         [HttpGet("upcoming")]
-        public async Task<ActionResult<List<EventViewModel>>> GetUpcomingEvents()
+        public async Task<ActionResult<List<EventViewModel>>> GetUpcomingEvents([FromQuery] string languageCode = "en")
         {
-            var events = await _service.GetUpcomingEventsAsync();
+            var events = await _service.GetUpcomingEventsAsync(languageCode);
             return Ok(ApiResponse<List<EventViewModel>>.Ok(events));
         }
 
@@ -48,31 +48,31 @@ namespace MasjidStory.Controllers
             return Ok(ApiResponse<string>.Ok("Registered successfully."));
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<EventViewModel>> GetById(int id)
+        public async Task<ActionResult<EventViewModel>> GetById(int id, [FromQuery] string languageCode = "en")
         {
             string? userId = User.Identity?.IsAuthenticated == true
                 ? User.FindFirstValue(ClaimTypes.NameIdentifier)
                 : null;
 
-            var ev = await _service.GetEventDetailsAsync(id, userId);
+            var ev = await _service.GetEventDetailsAsync(id, userId, languageCode);
             if (ev == null) return NotFound();
 
             return Ok(ApiResponse<EventViewModel>.Ok(ev));
         }
 
         [HttpGet("masjid/{masjidId}")]
-        public async Task<ActionResult<List<EventViewModel>>> GetMasjidEvents(int masjidId)
+        public async Task<ActionResult<List<EventViewModel>>> GetMasjidEvents(int masjidId, [FromQuery] string languageCode = "en")
         {
-            var result = await _service.GetMasjidEventsAsync(masjidId);
+            var result = await _service.GetMasjidEventsAsync(masjidId, languageCode);
             return Ok(ApiResponse<List<EventViewModel>>.Ok(result));
         }
 
         [HttpGet("my-registrations")]
         [Authorize]
-        public async Task<ActionResult<List<EventViewModel>>> GetMyRegistrations()
+        public async Task<ActionResult<List<EventViewModel>>> GetMyRegistrations([FromQuery] string languageCode = "en")
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var events = await _service.GetUserRegisteredEventsAsync(userId);
+            var events = await _service.GetUserRegisteredEventsAsync(userId, languageCode);
             return Ok(ApiResponse<List<EventViewModel>>.Ok(events));
         }
 

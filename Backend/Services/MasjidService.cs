@@ -111,9 +111,10 @@ namespace Services
             _masjidVisitRepository = masjidVisitRepository;
         }
 
-        public async Task<List<MasjidViewModel>> GetAllMasjidsAsync()
+        public async Task<List<MasjidViewModel>> GetAllMasjidsAsync(string languageCode = "en")
         {
-            return await _repository.GetAllAsync();
+            var masjids = await _repository.GetAllAsync(m => m.Country, m => m.City);
+            return masjids.Select(m => m.ToViewModel(languageCode)).ToList();
         }
 
         public async Task<List<MasjidViewModel>> GetMasjidsPagedAsync(string? search, int page, int size)

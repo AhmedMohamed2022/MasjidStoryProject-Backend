@@ -11,16 +11,8 @@ namespace ViewModels
     public class StoryCreateViewModel
     {
         [Required]
-        public string Title { get; set; }
-
-        [Required]
-        public string Content { get; set; }
-
-        [Required]
         public int MasjidId { get; set; }
-
-        public int? LanguageId { get; set; }
-
+        public List<StoryContentViewModel> Contents { get; set; } = new();
         public List<string>? Tags { get; set; }
         public List<IFormFile>? StoryImages { get; set; }
     }

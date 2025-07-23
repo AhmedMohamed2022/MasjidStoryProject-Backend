@@ -42,46 +42,42 @@ namespace Repositories.Implementations
             return entity.Id;
         }
 
-        public async Task<StoryViewModel?> GetByIdAsync(int id, string? currentUserId = null)
+        public async Task<StoryViewModel?> GetByIdAsync(int id, string? currentUserId = null, string languageCode = "en")
         {
             var story = await _baseRepo.GetFirstOrDefaultAsync(
                 s => s.Id == id,
                 s => s.ApplicationUser,
                 s => s.Masjid,
                 s => s.Masjid.Contents,
-                s => s.Language,
                 s => s.Likes,
                 s => s.Comments,
                 s => s.MediaItems,
-                s => s.StoryTags
+                s => s.StoryTags,
+                s => s.Contents
             );
-
-            return story?.ToViewModel(currentUserId);
+            return story?.ToViewModel(currentUserId, languageCode);
         }
 
-        public async Task<List<StoryViewModel>> GetAllAsync()
+        public async Task<List<StoryViewModel>> GetAllAsync(string languageCode = "en")
         {
             var stories = await _baseRepo.GetAllAsync(
                 s => s.ApplicationUser,
                 s => s.Masjid,
                 s => s.Masjid.Contents,
-                s => s.Language,
                 s => s.MediaItems,
-                s => s.StoryTags
+                s => s.StoryTags,
+                s => s.Contents
             );
-
-            return stories.Where(s => s.IsApproved == true).Select(s => s.ToViewModel()).ToList();
+            return stories.Where(s => s.IsApproved == true).Select(s => s.ToViewModel(null, languageCode)).ToList();
         }
 
         public async Task<bool> UpdateAsync(StoryEditViewModel model)
         {
             var entity = await _baseRepo.GetByIdAsync(model.Id);
             if (entity == null) return false;
-
             model.UpdateEntity(entity);
             _baseRepo.Update(entity);
             await _baseRepo.SaveChangesAsync();
-
             return true;
         }
 
@@ -129,99 +125,88 @@ namespace Repositories.Implementations
             return true;
         }
 
-        public async Task<List<StoryViewModel>> GetPendingAsync()
+        public async Task<List<StoryViewModel>> GetPendingAsync(string languageCode = "en")
         {
             var stories = await _baseRepo.FindAsync(
                 s => !s.IsApproved,
                 s => s.ApplicationUser,
                 s => s.Masjid,
                 s => s.Masjid.Contents,
-                s => s.Language,
                 s => s.MediaItems,
-                s => s.StoryTags
+                s => s.StoryTags,
+                s => s.Contents
             );
-
-            return stories.Select(s => s.ToViewModel()).ToList();
+            return stories.Select(s => s.ToViewModel(null, languageCode)).ToList();
         }
 
-        public async Task<List<StoryViewModel>> GetLatestApprovedStoriesAsync(int count)
+        public async Task<List<StoryViewModel>> GetLatestApprovedStoriesAsync(int count, string languageCode = "en")
         {
             var stories = await _baseRepo.FindAsync(
                 s => s.IsApproved,
                 s => s.ApplicationUser,
                 s => s.Masjid,
                 s => s.Masjid.Contents,
-                s => s.Language,
                 s => s.MediaItems,
-                s => s.StoryTags
+                s => s.StoryTags,
+                s => s.Contents
             );
-
             return stories.OrderByDescending(s => s.DatePublished)
                 .Take(count)
-                .Select(s => s.ToViewModel())
+                .Select(s => s.ToViewModel(null, languageCode))
                 .ToList();
         }
 
-        public async Task<List<StoryViewModel>> GetRelatedStoriesAsync(int storyId)
+        public async Task<List<StoryViewModel>> GetRelatedStoriesAsync(int storyId, string languageCode = "en")
         {
             var refStory = await _baseRepo.GetFirstOrDefaultAsync(
                 s => s.Id == storyId,
                 s => s.Masjid,
                 s => s.Masjid.Contents,
-                s => s.Language
+                s => s.Contents
             );
-
             if (refStory == null) return new();
-
             var related = await _baseRepo.FindAsync(
-                s => s.Id != storyId && s.IsApproved &&
-                     (s.MasjidId == refStory.MasjidId || s.LanguageId == refStory.LanguageId),
+                s => s.Id != storyId && s.IsApproved && s.MasjidId == refStory.MasjidId,
                 s => s.ApplicationUser,
                 s => s.Masjid,
                 s => s.Masjid.Contents,
-                s => s.Language,
                 s => s.MediaItems,
-                s => s.StoryTags
+                s => s.StoryTags,
+                s => s.Contents
             );
-
             return related.OrderByDescending(s => s.DatePublished)
                 .Take(3)
-                .Select(s => s.ToViewModel())
+                .Select(s => s.ToViewModel(null, languageCode))
                 .ToList();
         }
 
         public async Task<bool> ApproveAsync(int id)
         {
-            var story = await _baseRepo.GetByIdAsync(id);
+            var story = await _baseRepo.GetByIdAsync<int>(id); // Only need the entity, not the viewmodel
             if (story == null) return false;
-
             story.IsApproved = true;
             _baseRepo.Update(story);
             await _baseRepo.SaveChangesAsync();
             return true;
         }
 
-        public async Task<List<StoryViewModel>> GetStoriesByUserIdAsync(string userId)
+        public async Task<List<StoryViewModel>> GetStoriesByUserIdAsync(string userId, string languageCode = "en")
         {
             var stories = await _baseRepo.FindAsync(
                 s => s.ApplicationUserId == userId,
                 s => s.ApplicationUser,
                 s => s.Masjid,
                 s => s.Masjid.Contents,
-                s => s.Language,
                 s => s.MediaItems,
-                s => s.StoryTags
+                s => s.StoryTags,
+                s => s.Contents
             );
-
-            return stories.Select(s => s.ToViewModel()).ToList();
+            return stories.Select(s => s.ToViewModel(null, languageCode)).ToList();
         }
 
-        public async Task<PaginatedResponse<StoryViewModel>> GetPaginatedAsync(int page, int size)
+        public async Task<PaginatedResponse<StoryViewModel>> GetPaginatedAsync(int page, int size, string languageCode = "en")
         {
-            // Get total count of approved stories
             var totalCount = await _baseRepo.CountAsync(s => s.IsApproved);
-
-            // Get paginated stories
             var stories = await _baseRepo.GetListWithIncludePagedAsync(
                 s => s.IsApproved,
                 page,
@@ -229,13 +214,11 @@ namespace Repositories.Implementations
                 s => s.ApplicationUser,
                 s => s.Masjid,
                 s => s.Masjid.Contents,
-                s => s.Language,
                 s => s.MediaItems,
-                s => s.StoryTags                
+                s => s.StoryTags,
+                s => s.Contents
             );
-
-            var storyViewModels = stories.Select(s => s.ToViewModel()).ToList();
-
+            var storyViewModels = stories.Select(s => s.ToViewModel(null, languageCode)).ToList();
             return new PaginatedResponse<StoryViewModel>(storyViewModels, totalCount, page, size);
         }
     }
