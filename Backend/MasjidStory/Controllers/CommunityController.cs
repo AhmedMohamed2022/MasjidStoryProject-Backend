@@ -18,24 +18,22 @@ namespace MasjidStory.Controllers
         }
 
         [HttpGet("masjid/{masjidId}")]
-        public async Task<ActionResult<List<CommunityViewModel>>> GetMasjidCommunities(int masjidId)
+        public async Task<ActionResult<List<CommunityViewModel>>> GetMasjidCommunities(int masjidId, [FromQuery] string languageCode = "en")
         {
             string? userId = User.Identity?.IsAuthenticated == true
                 ? User.FindFirstValue(ClaimTypes.NameIdentifier)
                 : null;
-
-            var list = await _service.GetMasjidCommunitiesAsync(masjidId, userId);
+            var list = await _service.GetMasjidCommunitiesAsync(masjidId, userId, languageCode);
             return Ok(ApiResponse<List<CommunityViewModel>>.Ok(list));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CommunityViewModel>> GetById(int id)
+        public async Task<ActionResult<CommunityViewModel>> GetById(int id, [FromQuery] string languageCode = "en")
         {
             string? userId = User.Identity?.IsAuthenticated == true
                 ? User.FindFirstValue(ClaimTypes.NameIdentifier)
                 : null;
-
-            var item = await _service.GetByIdAsync(id, userId);
+            var item = await _service.GetByIdAsync(id, userId, languageCode);
             if (item == null) return NotFound();
             return Ok(ApiResponse<CommunityViewModel>.Ok(item));
         }
@@ -71,10 +69,10 @@ namespace MasjidStory.Controllers
 
         [HttpGet("my-communities")]
         [Authorize]
-        public async Task<ActionResult<List<CommunityViewModel>>> GetMyCommunities()
+        public async Task<ActionResult<List<CommunityViewModel>>> GetMyCommunities([FromQuery] string languageCode = "en")
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result = await _service.GetUserCommunitiesAsync(userId);
+            var result = await _service.GetUserCommunitiesAsync(userId, languageCode);
             return Ok(ApiResponse<List<CommunityViewModel>>.Ok(result));
         }
         // Update community
@@ -102,13 +100,12 @@ namespace MasjidStory.Controllers
         // Get all communities 
         [HttpGet("all")]
         [Authorize]
-        public async Task<ActionResult<List<CommunityViewModel>>> GetAllCommunities()
+        public async Task<ActionResult<List<CommunityViewModel>>> GetAllCommunities([FromQuery] string languageCode = "en")
         {
             string? userId = User.Identity?.IsAuthenticated == true
                 ? User.FindFirstValue(ClaimTypes.NameIdentifier)
                 : null;
-
-            var communities = await _service.GetAllCommunitiesAsync(userId);
+            var communities = await _service.GetAllCommunitiesAsync(userId, languageCode);
             return Ok(ApiResponse<List<CommunityViewModel>>.Ok(communities));
         }
     }

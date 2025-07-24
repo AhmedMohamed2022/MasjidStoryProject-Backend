@@ -20,24 +20,22 @@ namespace Services
             _memberRepo = memberRepo;
         }
 
-        public async Task<List<CommunityViewModel>> GetMasjidCommunitiesAsync(int masjidId, string? userId)
+        public async Task<List<CommunityViewModel>> GetMasjidCommunitiesAsync(int masjidId, string? userId, string languageCode = "en")
         {
             var communities = await _repo.FindAsync(
                 c => c.MasjidId == masjidId,
-                c => c.Language, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers
+                c => c.Contents, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers, c => c.Contents.Select(cc => cc.Language)
             );
-
-            return communities.Select(c => c.ToViewModel(userId)).ToList();
+            return communities.Select(c => c.ToViewModel(userId, languageCode)).ToList();
         }
 
-        public async Task<CommunityViewModel?> GetByIdAsync(int id, string? userId)
+        public async Task<CommunityViewModel?> GetByIdAsync(int id, string? userId, string languageCode = "en")
         {
             var community = await _repo.GetFirstOrDefaultAsync(
                 c => c.Id == id,
-                c => c.Language, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers
+                c => c.Contents, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers, c => c.Contents.Select(cc => cc.Language)
             );
-
-            return community?.ToViewModel(userId);
+            return community?.ToViewModel(userId, languageCode);
         }
 
         public async Task CreateAsync(CommunityCreateViewModel model, string userId)
@@ -73,23 +71,23 @@ namespace Services
             return true;
         }
 
-        public async Task<List<CommunityViewModel>> GetUserCommunitiesAsync(string userId)
+        public async Task<List<CommunityViewModel>> GetUserCommunitiesAsync(string userId, string languageCode = "en")
         {
-            var memberships = await _memberRepo.FindAsync(m => m.UserId == userId, m => m.Community);
+            var memberships = await _memberRepo.FindAsync(m => m.UserId == userId, m => m.Community, m => m.Community.Contents, m => m.Community.Contents.Select(cc => cc.Language));
             var communities = memberships.Select(m => m.Community).Distinct().ToList();
-
-            return communities.Select(c => c.ToViewModel(userId)).ToList();
+            return communities.Select(c => c.ToViewModel(userId, languageCode)).ToList();
         }
         public async Task<bool> UpdateCommunityAsync(int id, CommunityCreateViewModel model, string userId)
         {
-            var community = await _repo.GetByIdAsync(id);
+            var community = await _repo.GetFirstOrDefaultAsync(c => c.Id == id, c => c.Contents, c => c.Contents.Select(cc => cc.Language));
             if (community == null || community.CreatedById != userId) return false;
-
-            community.Title = model.Title;
-            community.Content = model.Content;
             community.MasjidId = model.MasjidId;
-            community.LanguageId = model.LanguageId;
-
+            // Replace all translations with the provided ones
+            community.Contents = model.Contents?.Select(cc => new CommunityContent {
+                LanguageId = cc.LanguageId,
+                Title = cc.Title,
+                Content = cc.Content
+            }).ToList() ?? new List<CommunityContent>();
             _repo.Update(community);
             await _repo.SaveChangesAsync();
             return true;
@@ -113,14 +111,13 @@ namespace Services
             return true;
         }
 
-        public async Task<List<CommunityViewModel>> GetAllCommunitiesAsync(string? userId)
+        public async Task<List<CommunityViewModel>> GetAllCommunitiesAsync(string? userId, string languageCode = "en")
         {
             var communities = await _repo.FindAsync(
                 c => true, // Get all communities
-                c => c.Language, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers
+                c => c.Contents, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers, c => c.Contents.Select(cc => cc.Language)
             );
-
-            return communities.Select(c => c.ToViewModel(userId)).ToList();
+            return communities.Select(c => c.ToViewModel(userId, languageCode)).ToList();
         }
     }
 

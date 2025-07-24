@@ -369,11 +369,6 @@ namespace Models.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("CreatedById")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -381,16 +376,11 @@ namespace Models.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("LanguageId")
+                    b.Property<int?>("LanguageId")
                         .HasColumnType("int");
 
                     b.Property<int>("MasjidId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
 
                     b.HasKey("Id");
 
@@ -401,6 +391,39 @@ namespace Models.Migrations
                     b.HasIndex("MasjidId");
 
                     b.ToTable("Communities", (string)null);
+                });
+
+            modelBuilder.Entity("Models.Entities.CommunityContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CommunityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommunityId");
+
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("CommunityContents", (string)null);
                 });
 
             modelBuilder.Entity("Models.Entities.CommunityMember", b =>
@@ -1154,11 +1177,9 @@ namespace Models.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Models.Entities.Language", "Language")
+                    b.HasOne("Models.Entities.Language", null)
                         .WithMany("Communities")
-                        .HasForeignKey("LanguageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LanguageId");
 
                     b.HasOne("Models.Entities.Masjid", "Masjid")
                         .WithMany("Communities")
@@ -1168,9 +1189,26 @@ namespace Models.Migrations
 
                     b.Navigation("CreatedBy");
 
-                    b.Navigation("Language");
-
                     b.Navigation("Masjid");
+                });
+
+            modelBuilder.Entity("Models.Entities.CommunityContent", b =>
+                {
+                    b.HasOne("Models.Entities.Community", "Community")
+                        .WithMany("Contents")
+                        .HasForeignKey("CommunityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.Entities.Language", "Language")
+                        .WithMany("CommunityContents")
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Community");
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Models.Entities.CommunityMember", b =>
@@ -1486,6 +1524,8 @@ namespace Models.Migrations
             modelBuilder.Entity("Models.Entities.Community", b =>
                 {
                     b.Navigation("CommunityMembers");
+
+                    b.Navigation("Contents");
                 });
 
             modelBuilder.Entity("Models.Entities.Country", b =>
@@ -1507,6 +1547,8 @@ namespace Models.Migrations
             modelBuilder.Entity("Models.Entities.Language", b =>
                 {
                     b.Navigation("Communities");
+
+                    b.Navigation("CommunityContents");
 
                     b.Navigation("Events");
 

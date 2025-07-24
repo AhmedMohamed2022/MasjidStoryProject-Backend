@@ -8,10 +8,8 @@ namespace ViewModels
 {
     public class CommunityCreateViewModel
     {
-        public string Title { get; set; }
-        public string Content { get; set; }
         public int MasjidId { get; set; }
-        public int LanguageId { get; set; }
+        public List<CommunityContentCreateViewModel> Contents { get; set; }
     }
 
 }

@@ -10,19 +10,26 @@ namespace ViewModels
 {
     public static class CommunityExtensions
     {
-        public static CommunityViewModel ToViewModel(this Community c, string? userId = null)
+        public static CommunityViewModel ToViewModel(this Community c, string? userId = null, string languageCode = "en")
         {
+            var content = c.Contents?.FirstOrDefault(x => x.Language != null && x.Language.Code == languageCode)
+                ?? c.Contents?.FirstOrDefault();
             return new CommunityViewModel
             {
                 Id = c.Id,
-                Title = c.Title,
-                Content = c.Content,
+                LocalizedTitle = content?.Title ?? string.Empty,
+                LocalizedContent = content?.Content ?? string.Empty,
                 MasjidId = c.MasjidId,
-                LanguageCode = c.Language?.Code ?? "en",
+                MasjidName = c.Masjid?.Contents?.FirstOrDefault(mc => mc.Language != null && mc.Language.Code == languageCode)?.Name ?? c.Masjid?.Contents?.FirstOrDefault()?.Name,
                 CreatedByName = $"{c.CreatedBy?.FirstName} {c.CreatedBy?.LastName}",
                 DateCreated = c.DateCreated,
                 IsUserMember = userId != null && c.CommunityMembers?.Any(m => m.UserId == userId) == true,
-                MemberCount = c.CommunityMembers?.Count ?? 0
+                MemberCount = c.CommunityMembers?.Count ?? 0,
+                Contents = c.Contents?.Select(cc => new CommunityContentViewModel {
+                    LanguageId = cc.LanguageId,
+                    Title = cc.Title,
+                    Content = cc.Content
+                }).ToList() ?? new List<CommunityContentViewModel>()
             };
         }
 
@@ -30,12 +37,14 @@ namespace ViewModels
         {
             return new Community
             {
-                Title = vm.Title,
-                Content = vm.Content,
                 MasjidId = vm.MasjidId,
-                LanguageId = vm.LanguageId,
                 CreatedById = userId,
-                DateCreated = DateTime.UtcNow
+                DateCreated = DateTime.UtcNow,
+                Contents = vm.Contents?.Select(cc => new CommunityContent {
+                    LanguageId = cc.LanguageId,
+                    Title = cc.Title,
+                    Content = cc.Content
+                }).ToList() ?? new List<CommunityContent>()
             };
         }
     }

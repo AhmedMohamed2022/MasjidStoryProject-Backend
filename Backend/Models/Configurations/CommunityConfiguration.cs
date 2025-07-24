@@ -17,13 +17,6 @@ namespace Models.Configurations
 
             builder.HasKey(c => c.Id);
 
-            builder.Property(c => c.Title)
-                .IsRequired()
-                .HasMaxLength(150);
-
-            builder.Property(c => c.Content)
-                .HasMaxLength(500);
-
             builder.HasOne(c => c.Masjid)
                 .WithMany(m => m.Communities)
                 .HasForeignKey(c => c.MasjidId)
