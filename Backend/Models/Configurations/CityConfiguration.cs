@@ -15,13 +15,15 @@ namespace Models.Configurations
         {
             builder.ToTable("Cities");
             builder.HasKey(c => c.Id);
-            builder.Property(c => c.Name)
-                   .IsRequired()
-                   .HasMaxLength(100);
-
-            //builder.HasIndex(c => new { c.Name, c.CountryId })
-            //       .IsUnique();
+            // Remove Name property config
+            // builder.Property(c => c.Name)
+            //        .IsRequired()
+            //        .HasMaxLength(100);
             // Relationships
+            builder.HasMany(c => c.Contents)
+                   .WithOne(cc => cc.City)
+                   .HasForeignKey(cc => cc.CityId)
+                   .OnDelete(DeleteBehavior.Cascade);
             builder.HasOne(c => c.Country)
                    .WithMany(ct => ct.Cities)
                    .HasForeignKey(c => c.CountryId)

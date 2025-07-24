@@ -18,6 +18,14 @@ namespace ViewModels
                 ?? masjid.Contents?.FirstOrDefault(c => c.LanguageId == 1)?.Name // English fallback
                 ?? masjid.Contents?.FirstOrDefault()?.Name
                 ?? string.Empty;
+            var countryName = masjid.Country?.Contents?.FirstOrDefault(c => c.LanguageId == langId)?.Name
+                ?? masjid.Country?.Contents?.FirstOrDefault(c => c.LanguageId == 1)?.Name
+                ?? masjid.Country?.Contents?.FirstOrDefault()?.Name
+                ?? string.Empty;
+            var cityName = masjid.City?.Contents?.FirstOrDefault(c => c.LanguageId == langId)?.Name
+                ?? masjid.City?.Contents?.FirstOrDefault(c => c.LanguageId == 1)?.Name
+                ?? masjid.City?.Contents?.FirstOrDefault()?.Name
+                ?? string.Empty;
             return new MasjidViewModel
             {
                 Id = masjid.Id,
@@ -29,8 +37,8 @@ namespace ViewModels
                 CountryId = masjid.CountryId,
                 CityId = masjid.CityId,
                 YearOfEstablishment = masjid.YearOfEstablishment,
-                CountryName = masjid.Country?.Name,
-                CityName = masjid.City?.Name,
+                CountryName = countryName,
+                CityName = cityName,
                 Contents = masjid.Contents?.Select(c => new MasjidContentViewModel {
                     LanguageId = c.LanguageId,
                     Name = c.Name,
@@ -78,16 +86,17 @@ namespace ViewModels
         }
         public static MasjidDetailsViewModel ToDetailsViewModel(this Masjid masjid, string? languageCode = null)
         {
-            // Debug log: languageCode and available codes
-            System.Diagnostics.Debug.WriteLine($"Requested languageCode: {languageCode}");
-            foreach (var c in masjid.Contents)
-            {
-                System.Diagnostics.Debug.WriteLine($"Content Language: {c.Language?.Code}, Name: {c.Name}");
-            }
-            // Use the language code directly
+            var langId = languageCode == "ar" ? 2 : 1;
             var content = masjid.Contents.FirstOrDefault(c => c.Language.Code == languageCode)
                           ?? masjid.Contents.FirstOrDefault();
-
+            var countryName = masjid.Country?.Contents?.FirstOrDefault(c => c.LanguageId == langId)?.Name
+                ?? masjid.Country?.Contents?.FirstOrDefault(c => c.LanguageId == 1)?.Name
+                ?? masjid.Country?.Contents?.FirstOrDefault()?.Name
+                ?? string.Empty;
+            var cityName = masjid.City?.Contents?.FirstOrDefault(c => c.LanguageId == langId)?.Name
+                ?? masjid.City?.Contents?.FirstOrDefault(c => c.LanguageId == 1)?.Name
+                ?? masjid.City?.Contents?.FirstOrDefault()?.Name
+                ?? string.Empty;
             return new MasjidDetailsViewModel
             {
                 Id = masjid.Id,
@@ -97,8 +106,8 @@ namespace ViewModels
                 Latitude = masjid.Latitude,
                 Longitude = masjid.Longitude,
                 YearOfEstablishment = masjid.YearOfEstablishment,
-                CountryName = masjid.Country?.Name,
-                CityName = masjid.City?.Name,
+                CountryName = countryName,
+                CityName = cityName,
                 LocalizedName = content?.Name ?? masjid.Contents.FirstOrDefault()?.Name ?? "",
                 LocalizedDescription = content?.Description ?? "",
                 MediaUrls = masjid.MediaItems?.Select(m => m.FileUrl).ToList() ?? new(),

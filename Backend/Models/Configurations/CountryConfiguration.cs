@@ -15,21 +15,20 @@ namespace Models.Configurations
             public void Configure(EntityTypeBuilder<Country> builder)
             {
                 builder.ToTable("Countries");
-
                 builder.HasKey(c => c.Id);
-                builder.Property(c => c.Name)
-                       .IsRequired()
-                       .HasMaxLength(100);
-            // Unique index on Name
-            //builder.HasIndex(c => c.Name).IsUnique();
-            //    builder.Property(c => c.Code)
-            //           .HasMaxLength(10);
-
-                //// Relationships
-                //builder.HasMany(c => c.Cities)
-                //       .WithOne(cy => cy.Country)
-                //       .HasForeignKey(cy => cy.CountryId)
-                //       .OnDelete(DeleteBehavior.Cascade);
+                // Remove Name property config
+                // builder.Property(c => c.Name)
+                //        .IsRequired()
+                //        .HasMaxLength(100);
+                // Relationships
+                builder.HasMany(c => c.Contents)
+                       .WithOne(cc => cc.Country)
+                       .HasForeignKey(cc => cc.CountryId)
+                       .OnDelete(DeleteBehavior.Cascade);
+                builder.HasMany(c => c.Cities)
+                       .WithOne(cy => cy.Country)
+                       .HasForeignKey(cy => cy.CountryId)
+                       .OnDelete(DeleteBehavior.Cascade);
             }
         }      
 }

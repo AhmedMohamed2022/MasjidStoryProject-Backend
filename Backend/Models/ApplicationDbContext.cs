@@ -19,6 +19,8 @@ namespace Models
         // DbSets
         public DbSet<Country> Countries { get; set; }
         public DbSet<City> Cities { get; set; }
+        public DbSet<CountryContent> CountryContents { get; set; }
+        public DbSet<CityContent> CityContents { get; set; }
         public DbSet<Masjid> Masjids { get; set; }
         public DbSet<Language> Languages { get; set; }
         public DbSet<MasjidContent> MasjidContents { get; set; }
@@ -32,6 +34,7 @@ namespace Models
         public DbSet<EventAttendee> EventAttendees { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<Community> Communities { get; set; }
+        public DbSet<CommunityContent> CommunityContents { get; set; }
         public DbSet<CommunityMember> CommunityMembers { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<MasjidVisit> MasjidVisits { get; set; }
@@ -41,10 +44,7 @@ namespace Models
         {
             base.OnModelCreating(builder);
             builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-            builder.Entity<Country>().HasData(new Country { Id = 1, Name = "Egypt", Code = "EG" }, new Country { Id = 2, Name = "Iraq", Code = "IR" });
-            builder.Entity<City>().HasData(new City { Id = 1, Name = "Cairo", CountryId = 1 }, new City { Id = 2, Name = "Bagdad", CountryId = 2 });
             builder.Entity<Language>().HasData(new Language { Id = 1, Name = "English", Code = "en" },new Language { Id = 2, Name = "Arabic", Code = "ar" });
-
         }
     }
 }

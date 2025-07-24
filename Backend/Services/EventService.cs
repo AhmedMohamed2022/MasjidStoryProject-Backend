@@ -109,10 +109,10 @@ namespace Services
             return events.Select(e => e.ToViewModel(userId, languageCode)).ToList();
         }
 
-        public async Task<bool> UpdateEventAsync(int id, EventCreateViewModel model, string userId)
+        public async Task<bool> UpdateEventAsync(int id, EventCreateViewModel model, string userId, bool isAdmin)
         {
             var entity = await _baseRepo.GetByIdAsync(id);
-            if (entity == null || (entity.CreatedById != userId)) return false;
+            if (entity == null || (entity.CreatedById != userId && !isAdmin)) return false;
 
             // Remove old contents and add new ones
             entity.Contents?.Clear();
@@ -133,10 +133,10 @@ namespace Services
             return true;
         }
 
-        public async Task<bool> DeleteEventAsync(int id, string userId)
+        public async Task<bool> DeleteEventAsync(int id, string userId, bool isAdmin)
         {
             var entity = await _baseRepo.GetByIdAsync(id);
-            if (entity == null || entity.CreatedById != userId) return false;
+            if (entity == null || (entity.CreatedById != userId && !isAdmin)) return false;
 
             _baseRepo.Delete(entity);
             await _baseRepo.SaveChangesAsync();

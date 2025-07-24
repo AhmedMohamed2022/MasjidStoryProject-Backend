@@ -384,8 +384,7 @@ namespace Models.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     MasjidId = table.Column<int>(type: "int", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedById = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LanguageId = table.Column<int>(type: "int", nullable: true)
+                    CreatedById = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -396,11 +395,6 @@ namespace Models.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Communities_Languages_LanguageId",
-                        column: x => x.LanguageId,
-                        principalTable: "Languages",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Communities_Masjids_MasjidId",
                         column: x => x.MasjidId,
@@ -904,11 +898,6 @@ namespace Models.Migrations
                 name: "IX_Communities_CreatedById",
                 table: "Communities",
                 column: "CreatedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Communities_LanguageId",
-                table: "Communities",
-                column: "LanguageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Communities_MasjidId",

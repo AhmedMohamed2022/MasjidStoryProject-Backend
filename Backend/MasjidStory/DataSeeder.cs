@@ -162,73 +162,90 @@ namespace MasjidStory
                 Console.WriteLine("ℹ Adding missing countries and cities...");
                 Console.WriteLine($"Missing countries: {string.Join(", ", missingCountryCodes)}");
                 var countriesToAdd = new List<Country>();
+                var countryTranslations = new Dictionary<string, (string en, string ar)>
+                {
+                    {"EG", ("Egypt", "مصر")},
+                    {"SA", ("Saudi Arabia", "المملكة العربية السعودية")},
+                    {"AE", ("United Arab Emirates", "الإمارات العربية المتحدة")},
+                    {"QA", ("Qatar", "قطر")},
+                    {"KW", ("Kuwait", "الكويت")},
+                    {"BH", ("Bahrain", "البحرين")},
+                    {"OM", ("Oman", "عمان")},
+                    {"JO", ("Jordan", "الأردن")},
+                    {"LB", ("Lebanon", "لبنان")},
+                    {"SY", ("Syria", "سوريا")},
+                    {"IQ", ("Iraq", "العراق")},
+                    {"YE", ("Yemen", "اليمن")},
+                    {"PS", ("Palestine", "فلسطين")},
+                    {"MA", ("Morocco", "المغرب")},
+                    {"DZ", ("Algeria", "الجزائر")},
+                    {"TN", ("Tunisia", "تونس")},
+                    {"LY", ("Libya", "ليبيا")},
+                    {"SD", ("Sudan", "السودان")},
+                    {"SO", ("Somalia", "الصومال")},
+                    {"DJ", ("Djibouti", "جيبوتي")},
+                    {"KM", ("Comoros", "جزر القمر")},
+                    {"TD", ("Chad", "تشاد")},
+                    {"MR", ("Mauritania", "موريتانيا")},
+                };
+                var languages = dbContext.Languages.ToList();
+                var enLang = languages.FirstOrDefault(l => l.Code == "en");
+                var arLang = languages.FirstOrDefault(l => l.Code == "ar");
                 foreach (var code in missingCountryCodes)
                 {
-                    var countryName = code switch
+                    var country = new Country { Code = code, Contents = new List<CountryContent>() };
+                    if (countryTranslations.TryGetValue(code, out var names))
                     {
-                        "EG" => "Egypt",
-                        "SA" => "Saudi Arabia",
-                        "AE" => "United Arab Emirates",
-                        "QA" => "Qatar",
-                        "KW" => "Kuwait",
-                        "BH" => "Bahrain",
-                        "OM" => "Oman",
-                        "JO" => "Jordan",
-                        "LB" => "Lebanon",
-                        "SY" => "Syria",
-                        "IQ" => "Iraq",
-                        "YE" => "Yemen",
-                        "PS" => "Palestine",
-                        "MA" => "Morocco",
-                        "DZ" => "Algeria",
-                        "TN" => "Tunisia",
-                        "LY" => "Libya",
-                        "SD" => "Sudan",
-                        "SO" => "Somalia",
-                        "DJ" => "Djibouti",
-                        "KM" => "Comoros",
-                        "TD" => "Chad",
-                        "MR" => "Mauritania",
-                        _ => code
-                    };
-                    countriesToAdd.Add(new Country { Code = code, Name = countryName });
+                        if (enLang != null)
+                            country.Contents.Add(new CountryContent { LanguageId = enLang.Id, Name = names.en });
+                        if (arLang != null)
+                            country.Contents.Add(new CountryContent { LanguageId = arLang.Id, Name = names.ar });
+                    }
+                    countriesToAdd.Add(country);
                 }
                 dbContext.Countries.AddRange(countriesToAdd);
                 dbContext.SaveChanges();
                 var allCountries = dbContext.Countries.ToList();
                 var citiesToAdd = new List<City>();
+                var cityTranslations = new Dictionary<string, List<(string en, string ar)>>
+                {
+                    {"EG", new List<(string, string)>{ ("Cairo", "القاهرة"), ("Alexandria", "الإسكندرية"), ("Giza", "الجيزة"), ("Sharm El Sheikh", "شرم الشيخ"), ("Luxor", "الأقصر"), ("Aswan", "أسوان"), ("Hurghada", "الغردقة") }},
+                    {"SA", new List<(string, string)>{ ("Riyadh", "الرياض"), ("Jeddah", "جدة"), ("Mecca", "مكة"), ("Medina", "المدينة المنورة"), ("Dammam", "الدمام"), ("Taif", "الطائف"), ("Abha", "أبها") }},
+                    {"AE", new List<(string, string)>{ ("Dubai", "دبي"), ("Abu Dhabi", "أبوظبي"), ("Sharjah", "الشارقة"), ("Ajman", "عجمان"), ("Ras Al Khaimah", "رأس الخيمة"), ("Fujairah", "الفجيرة") }},
+                    {"QA", new List<(string, string)>{ ("Doha", "الدوحة"), ("Al Wakrah", "الوكرة"), ("Al Khor", "الخور"), ("Lusail", "لوسيل") }},
+                    {"KW", new List<(string, string)>{ ("Kuwait City", "مدينة الكويت"), ("Salmiya", "السالمية"), ("Hawally", "حولي"), ("Jahra", "الجهراء") }},
+                    {"BH", new List<(string, string)>{ ("Manama", "المنامة"), ("Muharraq", "المحرق"), ("Riffa", "الرفاع"), ("Hamad Town", "مدينة حمد") }},
+                    {"OM", new List<(string, string)>{ ("Muscat", "مسقط"), ("Salalah", "صلالة"), ("Sohar", "صحار"), ("Nizwa", "نزوى") }},
+                    {"JO", new List<(string, string)>{ ("Amman", "عمان"), ("Zarqa", "الزرقاء"), ("Irbid", "إربد"), ("Aqaba", "العقبة"), ("Petra", "البتراء") }},
+                    {"LB", new List<(string, string)>{ ("Beirut", "بيروت"), ("Tripoli", "طرابلس"), ("Sidon", "صيدا"), ("Tyre", "صور"), ("Baalbek", "بعلبك") }},
+                    {"SY", new List<(string, string)>{ ("Damascus", "دمشق"), ("Aleppo", "حلب"), ("Homs", "حمص"), ("Latakia", "اللاذقية"), ("Hama", "حماة") }},
+                    {"IQ", new List<(string, string)>{ ("Baghdad", "بغداد"), ("Basra", "البصرة"), ("Mosul", "الموصل"), ("Erbil", "أربيل"), ("Najaf", "النجف"), ("Karbala", "كربلاء"), ("Samarra", "سامراء") }},
+                    {"YE", new List<(string, string)>{ ("Sana'a", "صنعاء"), ("Aden", "عدن"), ("Taiz", "تعز"), ("Hodeidah", "الحديدة"), ("Ibb", "إب") }},
+                    {"PS", new List<(string, string)>{ ("Jerusalem", "القدس"), ("Gaza", "غزة"), ("Ramallah", "رام الله"), ("Bethlehem", "بيت لحم"), ("Hebron", "الخليل"), ("Nablus", "نابلس") }},
+                    {"MA", new List<(string, string)>{ ("Casablanca", "الدار البيضاء"), ("Rabat", "الرباط"), ("Fez", "فاس"), ("Marrakech", "مراكش"), ("Tangier", "طنجة"), ("Agadir", "أكادير") }},
+                    {"DZ", new List<(string, string)>{ ("Algiers", "الجزائر"), ("Oran", "وهران"), ("Constantine", "قسنطينة"), ("Annaba", "عنابة"), ("Batna", "باتنة") }},
+                    {"TN", new List<(string, string)>{ ("Tunis", "تونس"), ("Sfax", "صفاقس"), ("Sousse", "سوسة"), ("Kairouan", "القيروان"), ("Gabès", "قابس") }},
+                    {"LY", new List<(string, string)>{ ("Tripoli", "طرابلس"), ("Benghazi", "بنغازي"), ("Misrata", "مصراتة"), ("Tobruk", "طبرق"), ("Sabha", "سبها") }},
+                    {"SD", new List<(string, string)>{ ("Khartoum", "الخرطوم"), ("Omdurman", "أم درمان"), ("Port Sudan", "بورتسودان"), ("Kassala", "كسلا"), ("El Obeid", "الأبيض") }},
+                    {"SO", new List<(string, string)>{ ("Mogadishu", "مقديشو"), ("Hargeisa", "هرجيسا"), ("Bosaso", "بوصاصو"), ("Kismayo", "كيسمايو") }},
+                    {"DJ", new List<(string, string)>{ ("Djibouti City", "مدينة جيبوتي"), ("Ali Sabieh", "علي صبيح"), ("Tadjourah", "تاجورة") }},
+                    {"KM", new List<(string, string)>{ ("Moroni", "موروني"), ("Mutsamudu", "متسامودو"), ("Fomboni", "فومبوني") }},
+                    {"TD", new List<(string, string)>{ ("N'Djamena", "نجامينا"), ("Moundou", "موندو"), ("Sarh", "ساره") }},
+                    {"MR", new List<(string, string)>{ ("Nouakchott", "نواكشوط"), ("Nouadhibou", "نواذيبو"), ("Rosso", "روصو") }},
+                };
                 foreach (var country in countriesToAdd)
                 {
-                    var cities = country.Code switch
+                    if (cityTranslations.TryGetValue(country.Code, out var cityList))
                     {
-                        "EG" => new[] { "Cairo", "Alexandria", "Giza", "Sharm El Sheikh", "Luxor", "Aswan", "Hurghada" },
-                        "SA" => new[] { "Riyadh", "Jeddah", "Mecca", "Medina", "Dammam", "Taif", "Abha" },
-                        "AE" => new[] { "Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Ras Al Khaimah", "Fujairah" },
-                        "QA" => new[] { "Doha", "Al Wakrah", "Al Khor", "Lusail" },
-                        "KW" => new[] { "Kuwait City", "Salmiya", "Hawally", "Jahra" },
-                        "BH" => new[] { "Manama", "Muharraq", "Riffa", "Hamad Town" },
-                        "OM" => new[] { "Muscat", "Salalah", "Sohar", "Nizwa" },
-                        "JO" => new[] { "Amman", "Zarqa", "Irbid", "Aqaba", "Petra" },
-                        "LB" => new[] { "Beirut", "Tripoli", "Sidon", "Tyre", "Baalbek" },
-                        "SY" => new[] { "Damascus", "Aleppo", "Homs", "Latakia", "Hama" },
-                        "IQ" => new[] { "Baghdad", "Basra", "Mosul", "Erbil", "Najaf", "Karbala", "Samarra" },
-                        "YE" => new[] { "Sana'a", "Aden", "Taiz", "Hodeidah", "Ibb" },
-                        "PS" => new[] { "Jerusalem", "Gaza", "Ramallah", "Bethlehem", "Hebron", "Nablus" },
-                        "MA" => new[] { "Casablanca", "Rabat", "Fez", "Marrakech", "Tangier", "Agadir" },
-                        "DZ" => new[] { "Algiers", "Oran", "Constantine", "Annaba", "Batna" },
-                        "TN" => new[] { "Tunis", "Sfax", "Sousse", "Kairouan", "Gabès" },
-                        "LY" => new[] { "Tripoli", "Benghazi", "Misrata", "Tobruk", "Sabha" },
-                        "SD" => new[] { "Khartoum", "Omdurman", "Port Sudan", "Kassala", "El Obeid" },
-                        "SO" => new[] { "Mogadishu", "Hargeisa", "Bosaso", "Kismayo" },
-                        "DJ" => new[] { "Djibouti City", "Ali Sabieh", "Tadjourah" },
-                        "KM" => new[] { "Moroni", "Mutsamudu", "Fomboni" },
-                        "TD" => new[] { "N'Djamena", "Moundou", "Sarh" },
-                        "MR" => new[] { "Nouakchott", "Nouadhibou", "Rosso" },
-                        _ => new string[0]
-                    };
-                    foreach (var cityName in cities)
-                    {
-                        citiesToAdd.Add(new City { CountryId = country.Id, Name = cityName });
+                        foreach (var (en, ar) in cityList)
+                        {
+                            var city = new City { CountryId = country.Id, Contents = new List<CityContent>() };
+                            if (enLang != null)
+                                city.Contents.Add(new CityContent { LanguageId = enLang.Id, Name = en });
+                            if (arLang != null)
+                                city.Contents.Add(new CityContent { LanguageId = arLang.Id, Name = ar });
+                            citiesToAdd.Add(city);
+                        }
                     }
                 }
                 dbContext.Cities.AddRange(citiesToAdd);

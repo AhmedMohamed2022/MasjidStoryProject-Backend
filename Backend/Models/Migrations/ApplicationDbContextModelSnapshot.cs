@@ -289,6 +289,27 @@ namespace Models.Migrations
                     b.Property<int>("CountryId")
                         .HasColumnType("int");
 
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("Cities", (string)null);
+                });
+
+            modelBuilder.Entity("Models.Entities.CityContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -296,23 +317,11 @@ namespace Models.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountryId");
+                    b.HasIndex("CityId");
 
-                    b.ToTable("Cities", (string)null);
+                    b.HasIndex("LanguageId");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CountryId = 1,
-                            Name = "Cairo"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CountryId = 2,
-                            Name = "Bagdad"
-                        });
+                    b.ToTable("CityContents", (string)null);
                 });
 
             modelBuilder.Entity("Models.Entities.Comment", b =>
@@ -376,17 +385,12 @@ namespace Models.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("LanguageId")
-                        .HasColumnType("int");
-
                     b.Property<int>("MasjidId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("LanguageId");
 
                     b.HasIndex("MasjidId");
 
@@ -466,6 +470,25 @@ namespace Models.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries", (string)null);
+                });
+
+            modelBuilder.Entity("Models.Entities.CountryContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LanguageId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -473,21 +496,11 @@ namespace Models.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries", (string)null);
+                    b.HasIndex("CountryId");
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Code = "EG",
-                            Name = "Egypt"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Code = "IR",
-                            Name = "Iraq"
-                        });
+                    b.HasIndex("LanguageId");
+
+                    b.ToTable("CountryContents", (string)null);
                 });
 
             modelBuilder.Entity("Models.Entities.Event", b =>
@@ -1151,6 +1164,25 @@ namespace Models.Migrations
                     b.Navigation("Country");
                 });
 
+            modelBuilder.Entity("Models.Entities.CityContent", b =>
+                {
+                    b.HasOne("Models.Entities.City", "City")
+                        .WithMany("Contents")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("Language");
+                });
+
             modelBuilder.Entity("Models.Entities.Comment", b =>
                 {
                     b.HasOne("Models.Entities.Story", "Story")
@@ -1176,10 +1208,6 @@ namespace Models.Migrations
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Models.Entities.Language", null)
-                        .WithMany("Communities")
-                        .HasForeignKey("LanguageId");
 
                     b.HasOne("Models.Entities.Masjid", "Masjid")
                         .WithMany("Communities")
@@ -1228,6 +1256,25 @@ namespace Models.Migrations
                     b.Navigation("Community");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Models.Entities.CountryContent", b =>
+                {
+                    b.HasOne("Models.Entities.Country", "Country")
+                        .WithMany("Contents")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Models.Entities.Language", "Language")
+                        .WithMany()
+                        .HasForeignKey("LanguageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+
+                    b.Navigation("Language");
                 });
 
             modelBuilder.Entity("Models.Entities.Event", b =>
@@ -1516,6 +1563,8 @@ namespace Models.Migrations
 
             modelBuilder.Entity("Models.Entities.City", b =>
                 {
+                    b.Navigation("Contents");
+
                     b.Navigation("Masjids");
 
                     b.Navigation("Users");
@@ -1532,6 +1581,8 @@ namespace Models.Migrations
                 {
                     b.Navigation("Cities");
 
+                    b.Navigation("Contents");
+
                     b.Navigation("Masjids");
 
                     b.Navigation("Users");
@@ -1546,8 +1597,6 @@ namespace Models.Migrations
 
             modelBuilder.Entity("Models.Entities.Language", b =>
                 {
-                    b.Navigation("Communities");
-
                     b.Navigation("CommunityContents");
 
                     b.Navigation("Events");

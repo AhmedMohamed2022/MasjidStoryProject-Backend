@@ -24,7 +24,7 @@ namespace Services
         {
             var communities = await _repo.FindAsync(
                 c => c.MasjidId == masjidId,
-                c => c.Contents, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers, c => c.Contents.Select(cc => cc.Language)
+                c => c.Contents, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers
             );
             return communities.Select(c => c.ToViewModel(userId, languageCode)).ToList();
         }
@@ -33,7 +33,7 @@ namespace Services
         {
             var community = await _repo.GetFirstOrDefaultAsync(
                 c => c.Id == id,
-                c => c.Contents, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers, c => c.Contents.Select(cc => cc.Language)
+                c => c.Contents, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers
             );
             return community?.ToViewModel(userId, languageCode);
         }
@@ -73,13 +73,13 @@ namespace Services
 
         public async Task<List<CommunityViewModel>> GetUserCommunitiesAsync(string userId, string languageCode = "en")
         {
-            var memberships = await _memberRepo.FindAsync(m => m.UserId == userId, m => m.Community, m => m.Community.Contents, m => m.Community.Contents.Select(cc => cc.Language));
+            var memberships = await _memberRepo.FindAsync(m => m.UserId == userId, m => m.Community, m => m.Community.Contents);
             var communities = memberships.Select(m => m.Community).Distinct().ToList();
             return communities.Select(c => c.ToViewModel(userId, languageCode)).ToList();
         }
         public async Task<bool> UpdateCommunityAsync(int id, CommunityCreateViewModel model, string userId)
         {
-            var community = await _repo.GetFirstOrDefaultAsync(c => c.Id == id, c => c.Contents, c => c.Contents.Select(cc => cc.Language));
+            var community = await _repo.GetFirstOrDefaultAsync(c => c.Id == id, c => c.Contents);
             if (community == null || community.CreatedById != userId) return false;
             community.MasjidId = model.MasjidId;
             // Replace all translations with the provided ones
@@ -115,7 +115,7 @@ namespace Services
         {
             var communities = await _repo.FindAsync(
                 c => true, // Get all communities
-                c => c.Contents, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers, c => c.Contents.Select(cc => cc.Language)
+                c => c.Contents, c => c.Masjid, c => c.CreatedBy, c => c.CommunityMembers
             );
             return communities.Select(c => c.ToViewModel(userId, languageCode)).ToList();
         }

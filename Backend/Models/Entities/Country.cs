@@ -10,10 +10,11 @@ namespace Models.Entities
     public class Country
     {
         public int Id { get; set; }
-        public string Name { get; set; }
         public string Code { get; set; }  // e.g. EG, SA
         public virtual ICollection<City> Cities { get; set; }
         public virtual ICollection<ApplicationUser> Users { get; set; }
         public virtual ICollection<Masjid> Masjids { get; set; }
+        // Add translation support
+        public virtual ICollection<CountryContent> Contents { get; set; }
     }
 }

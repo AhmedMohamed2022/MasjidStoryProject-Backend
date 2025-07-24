@@ -16,7 +16,6 @@ namespace Models.Entities
         public virtual ICollection<MasjidContent> MasjidContents { get; set; }
         public virtual ICollection<Story> Stories { get; set; }
         public virtual ICollection<Event> Events { get; set; }
-        public virtual ICollection<Community> Communities { get; set; }
         public virtual ICollection<CommunityContent> CommunityContents { get; set; }
     }
 }

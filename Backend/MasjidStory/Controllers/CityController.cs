@@ -18,15 +18,22 @@ namespace MasjidStory.Controllers
 
         // GET: api/city/all
         [HttpGet("all")]
-        public async Task<ActionResult<ApiResponse<List<CityViewModel>>>> GetAllCities()
+        public async Task<ActionResult<ApiResponse<List<CityViewModel>>>> GetAllCities([FromQuery] string languageCode = "en")
         {
+            var langId = languageCode.ToLower() == "ar" ? 2 : 1;
             var cities = await _cityRepo.GetAllAsync(c => c.Country);
             var viewModels = cities.Select(c => new CityViewModel
             {
                 Id = c.Id,
-                Name = c.Name,
+                Name = c.Contents?.FirstOrDefault(x => x.LanguageId == langId)?.Name
+                    ?? c.Contents?.FirstOrDefault(x => x.LanguageId == 1)?.Name
+                    ?? c.Contents?.FirstOrDefault()?.Name
+                    ?? string.Empty,
                 CountryId = c.CountryId,
-                CountryName = c.Country?.Name ?? ""
+                CountryName = c.Country?.Contents?.FirstOrDefault(x => x.LanguageId == langId)?.Name
+                    ?? c.Country?.Contents?.FirstOrDefault(x => x.LanguageId == 1)?.Name
+                    ?? c.Country?.Contents?.FirstOrDefault()?.Name
+                    ?? string.Empty
             }).ToList();
 
             return Ok(ApiResponse<List<CityViewModel>>.Ok(viewModels));
@@ -34,15 +41,22 @@ namespace MasjidStory.Controllers
 
         // GET: api/city/bycountry/{countryId}
         [HttpGet("bycountry/{countryId}")]
-        public async Task<ActionResult<ApiResponse<List<CityViewModel>>>> GetCitiesByCountry(int countryId)
+        public async Task<ActionResult<ApiResponse<List<CityViewModel>>>> GetCitiesByCountry(int countryId, [FromQuery] string languageCode = "en")
         {
+            var langId = languageCode.ToLower() == "ar" ? 2 : 1;
             var cities = await _cityRepo.FindAsync(c => c.CountryId == countryId, c => c.Country);
             var viewModels = cities.Select(c => new CityViewModel
             {
                 Id = c.Id,
-                Name = c.Name,
+                Name = c.Contents?.FirstOrDefault(x => x.LanguageId == langId)?.Name
+                    ?? c.Contents?.FirstOrDefault(x => x.LanguageId == 1)?.Name
+                    ?? c.Contents?.FirstOrDefault()?.Name
+                    ?? string.Empty,
                 CountryId = c.CountryId,
-                CountryName = c.Country?.Name ?? ""
+                CountryName = c.Country?.Contents?.FirstOrDefault(x => x.LanguageId == langId)?.Name
+                    ?? c.Country?.Contents?.FirstOrDefault(x => x.LanguageId == 1)?.Name
+                    ?? c.Country?.Contents?.FirstOrDefault()?.Name
+                    ?? string.Empty
             }).ToList();
 
             return Ok(ApiResponse<List<CityViewModel>>.Ok(viewModels));

@@ -81,8 +81,9 @@ namespace MasjidStory.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] EventCreateViewModel model)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var updated = await _service.UpdateEventAsync(id, model, userId);
-            if (!updated) return Forbid("Only creator can edit.");
+            var isAdmin = User.IsInRole("Admin");
+            var updated = await _service.UpdateEventAsync(id, model, userId, isAdmin);
+            if (!updated) return Forbid();
             return Ok(ApiResponse<string>.Ok("Event updated successfully."));
         }
 
@@ -91,8 +92,9 @@ namespace MasjidStory.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var deleted = await _service.DeleteEventAsync(id, userId);
-            if (!deleted) return Forbid("Only creator can delete.");
+            var isAdmin = User.IsInRole("Admin");
+            var deleted = await _service.DeleteEventAsync(id, userId, isAdmin);
+            if (!deleted) return Forbid();
             return Ok(ApiResponse<string>.Ok("Event deleted successfully."));
         }
 
