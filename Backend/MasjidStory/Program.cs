@@ -96,8 +96,8 @@ namespace MasjidStory
             //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAngularDev",
-                    policy => policy.WithOrigins("http://localhost:4200")
+                options.AddPolicy("AllowFrontend",
+                    policy => policy.WithOrigins("http://localhost:4200", "https://masjidstory.netlify.app")
                                     .AllowAnyMethod()
                                     .AllowAnyHeader()
                                     .AllowCredentials());
@@ -175,7 +175,7 @@ namespace MasjidStory
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            app.UseCors("AllowAngularDev");
+            app.UseCors("AllowFrontend");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseStaticFiles();  // enables access to /uploads/image.jpg
