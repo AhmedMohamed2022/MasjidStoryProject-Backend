@@ -17,7 +17,9 @@ namespace Models.Entities
         public virtual City City { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
-        public string Address { get; set; }
+        /// <summary>
+        /// Architectural style key (e.g. OTTOMAN, FATIMID, etc.). Use i18n for display.
+        /// </summary>
         public string ArchStyle { get; set; }
         public DateTime DateOfRecord { get; set; } = DateTime.UtcNow;
         public int? YearOfEstablishment { get; set; }

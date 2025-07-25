@@ -12,7 +12,6 @@ namespace ViewModels
     {
         // Per-language content (translations)
         public List<MasjidContentViewModel> Contents { get; set; } = new();
-        public string Address { get; set; }
         public string ArchStyle { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }

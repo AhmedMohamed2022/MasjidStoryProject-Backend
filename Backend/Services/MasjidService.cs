@@ -117,9 +117,10 @@ namespace Services
             return masjids.Select(m => m.ToViewModel(languageCode)).ToList();
         }
 
-        public async Task<List<MasjidViewModel>> GetMasjidsPagedAsync(string? search, int page, int size)
+        public async Task<List<MasjidViewModel>> GetMasjidsPagedAsync(string? search, int page, int size, string languageCode = "en")
         {
-            return await _repository.GetFilteredAsync(search, page, size);
+            var masjids = await _repository.GetFilteredAsync(search, page, size);
+            return masjids.Select(m => m.ToViewModel(languageCode)).ToList();
         }
 
         public async Task<MasjidViewModel> GetMasjidByIdAsync(int id)
@@ -163,7 +164,7 @@ namespace Services
             return true;
         }
 
-        public async Task<List<MasjidViewModel>> GetFeaturedMasjidsAsync()
+        public async Task<List<MasjidViewModel>> GetFeaturedMasjidsAsync(string languageCode = "en")
         {
             var masjids = await _repository.GetAllAsync(
                 m => m.Visits, m => m.Stories, m => m.Country, m => m.City
@@ -173,7 +174,7 @@ namespace Services
                 .OrderByDescending(m => m.Visits?.Count ?? 0)
                 .ThenByDescending(m => m.Stories?.Count ?? 0)
                 .Take(6)
-                .Select(m => m.ToViewModel())
+                .Select(m => m.ToViewModel(languageCode))
                 .ToList();
 
             return featured;

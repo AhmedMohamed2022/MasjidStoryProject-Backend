@@ -11,7 +11,7 @@ namespace Repositories.Interfaces
     {
         Task<List<MasjidViewModel>> GetAllAsync();
         Task<List<Masjid>> GetAllAsync(params Expression<Func<Masjid, object>>[] includes);
-        Task<List<MasjidViewModel>> GetFilteredAsync(string? search, int pageNumber, int pageSize);
+        Task<List<Masjid>> GetFilteredAsync(string? search, int pageNumber, int pageSize);
         Task<MasjidViewModel?> GetByIdAsync(int id);
         Task<MasjidEditViewModel?> GetEditByIdAsync(int id);
         Task<int> AddAsync(MasjidCreateViewModel model);

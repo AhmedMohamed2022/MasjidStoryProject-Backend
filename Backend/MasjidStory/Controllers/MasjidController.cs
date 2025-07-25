@@ -38,9 +38,9 @@ namespace MasjidStory.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<ActionResult<List<MasjidViewModel>>> Search([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int size = 10)
+        public async Task<ActionResult<List<MasjidViewModel>>> Search([FromQuery] string? query, [FromQuery] int page = 1, [FromQuery] int size = 10, [FromQuery] string languageCode = "en")
         {
-            var result = await _service.GetMasjidsPagedAsync(query, page, size);
+            var result = await _service.GetMasjidsPagedAsync(query, page, size, languageCode);
             return Ok(ApiResponse<List<MasjidViewModel>>.Ok(result));
         }
 
@@ -232,9 +232,9 @@ namespace MasjidStory.Controllers
         }
 
         [HttpGet("featured")]
-        public async Task<ActionResult<List<MasjidViewModel>>> GetFeaturedMasjids()
+        public async Task<ActionResult<List<MasjidViewModel>>> GetFeaturedMasjids([FromQuery] string languageCode = "en")
         {
-            var masjids = await _service.GetFeaturedMasjidsAsync();
+            var masjids = await _service.GetFeaturedMasjidsAsync(languageCode);
             return Ok(ApiResponse<List<MasjidViewModel>>.Ok(masjids));
         }
     }

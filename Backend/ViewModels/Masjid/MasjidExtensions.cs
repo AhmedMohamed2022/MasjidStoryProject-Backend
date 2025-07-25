@@ -30,7 +30,6 @@ namespace ViewModels
             {
                 Id = masjid.Id,
                 //ShortName = masjid.ShortName,
-                Address = masjid.Address,
                 ArchStyle = masjid.ArchStyle,
                 Latitude = masjid.Latitude,
                 Longitude = masjid.Longitude,
@@ -42,7 +41,8 @@ namespace ViewModels
                 Contents = masjid.Contents?.Select(c => new MasjidContentViewModel {
                     LanguageId = c.LanguageId,
                     Name = c.Name,
-                    Description = c.Description
+                    Description = c.Description,
+                    Address = c.Address // NEW: per-language address
                 }).ToList() ?? new List<MasjidContentViewModel>(),
                 LocalizedName = localizedName
             };
@@ -52,7 +52,6 @@ namespace ViewModels
         {
             var entity = new Masjid
             {
-                Address = model.Address,
                 ArchStyle = model.ArchStyle,
                 Latitude = model.Latitude,
                 Longitude = model.Longitude,
@@ -62,7 +61,8 @@ namespace ViewModels
                 Contents = model.Contents?.Select(c => new MasjidContent {
                     LanguageId = c.LanguageId,
                     Name = c.Name,
-                    Description = c.Description
+                    Description = c.Description,
+                    Address = c.Address // NEW: per-language address
                 }).ToList() ?? new List<MasjidContent>()
             };
             return entity;
@@ -70,7 +70,6 @@ namespace ViewModels
 
         public static void UpdateEntity(this MasjidEditViewModel model, Masjid entity)
         {
-            entity.Address = model.Address;
             entity.ArchStyle = model.ArchStyle;
             entity.Latitude = model.Latitude;
             entity.Longitude = model.Longitude;
@@ -81,7 +80,8 @@ namespace ViewModels
             entity.Contents = model.Contents?.Select(c => new MasjidContent {
                 LanguageId = c.LanguageId,
                 Name = c.Name,
-                Description = c.Description
+                Description = c.Description,
+                Address = c.Address // NEW: per-language address
             }).ToList() ?? new List<MasjidContent>();
         }
         public static MasjidDetailsViewModel ToDetailsViewModel(this Masjid masjid, string? languageCode = null)
@@ -101,7 +101,7 @@ namespace ViewModels
             {
                 Id = masjid.Id,
                 //ShortName = masjid.ShortName,
-                Address = masjid.Address,
+                // Address = masjid.Address, // REMOVED
                 ArchStyle = masjid.ArchStyle,
                 Latitude = masjid.Latitude,
                 Longitude = masjid.Longitude,
@@ -110,6 +110,7 @@ namespace ViewModels
                 CityName = cityName,
                 LocalizedName = content?.Name ?? masjid.Contents.FirstOrDefault()?.Name ?? "",
                 LocalizedDescription = content?.Description ?? "",
+                LocalizedAddress = content?.Address ?? masjid.Contents.FirstOrDefault()?.Address ?? "", // NEW: per-language address
                 MediaUrls = masjid.MediaItems?.Select(m => m.FileUrl).ToList() ?? new(),
                 Stories = masjid.Stories
                     .Where(s => s.IsApproved)

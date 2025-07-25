@@ -348,7 +348,7 @@ namespace Repositories.Implementations
             return await _baseRepo.GetAllAsync(includes);
         }
 
-        public async Task<List<MasjidViewModel>> GetFilteredAsync(string? search, int pageNumber, int pageSize)
+        public async Task<List<Masjid>> GetFilteredAsync(string? search, int pageNumber, int pageSize)
         {
             Expression<Func<Masjid, bool>> filter = m =>
                 string.IsNullOrEmpty(search) || m.Contents.Any(c => c.Name.ToLower().Contains(search.ToLower()));
@@ -361,7 +361,7 @@ namespace Repositories.Implementations
                 m => m.City
             );
 
-            return masjids.Select(m => m.ToViewModel()).ToList();
+            return masjids;
         }
 
         public async Task<MasjidViewModel?> GetByIdAsync(int id)
@@ -377,25 +377,26 @@ namespace Repositories.Implementations
             var entity = await _context.Masjids
                 .Include(m => m.Contents)
                 .FirstOrDefaultAsync(m => m.Id == id);
-                
-            if (entity == null) return null;
             
-            // Get the default English content or the first available content
-            var defaultLanguage = await _context.Languages.FirstOrDefaultAsync(l => l.Code == "en");
-            var content = entity.Contents?.FirstOrDefault(c => c.LanguageId == defaultLanguage?.Id) 
-                         ?? entity.Contents?.FirstOrDefault();
+            if (entity == null) return null;
             
             return new MasjidEditViewModel
             {
                 Id = entity.Id,
                 //ShortName = entity.ShortName,
-                Address = entity.Address,
                 ArchStyle = entity.ArchStyle,
                 Latitude = entity.Latitude,
                 Longitude = entity.Longitude,
                 CountryId = entity.CountryId,
                 CityId = entity.CityId,
-                YearOfEstablishment = entity.YearOfEstablishment
+                YearOfEstablishment = entity.YearOfEstablishment,
+                Contents = entity.Contents?.Select(c => new MasjidContentViewModel
+                {
+                    LanguageId = c.LanguageId,
+                    Name = c.Name,
+                    Description = c.Description,
+                    Address = c.Address
+                }).ToList() ?? new List<MasjidContentViewModel>()
             };
         }
 
@@ -404,7 +405,6 @@ namespace Repositories.Implementations
             var entity = model.ToEntity();
             await _baseRepo.AddAsync(entity);
             await _baseRepo.SaveChangesAsync();
-            // All translations are now handled via Contents
             return entity.Id;
         }
 
@@ -414,6 +414,10 @@ namespace Repositories.Implementations
                 .Include(m => m.Contents)
                 .FirstOrDefaultAsync(m => m.Id == model.Id);
             if (entity == null) return false;
+            // Remove old contents
+            _context.MasjidContents.RemoveRange(entity.Contents);
+            await _context.SaveChangesAsync();
+            // Map new contents
             model.UpdateEntity(entity);
             _baseRepo.Update(entity);
             await _baseRepo.SaveChangesAsync();

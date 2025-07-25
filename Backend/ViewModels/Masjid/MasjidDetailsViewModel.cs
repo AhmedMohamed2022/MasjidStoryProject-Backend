@@ -11,7 +11,6 @@ namespace ViewModels
     {
         public int Id { get; set; }
         public string ShortName { get; set; }
-        public string Address { get; set; }
         public string ArchStyle { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
@@ -22,6 +21,7 @@ namespace ViewModels
         // Localized content
         public string LocalizedName { get; set; }
         public string LocalizedDescription { get; set; }
+        public string LocalizedAddress { get; set; } // NEW: per-language address
 
         // All available language contents
         public List<MasjidContentViewModel> Contents { get; set; } = new();

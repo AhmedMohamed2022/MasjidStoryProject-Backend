@@ -15,8 +15,6 @@ namespace Models.Configurations
         {
             builder.ToTable("Masjids");
             builder.HasKey(m => m.Id);
-            builder.Property(m => m.Address)
-                   .HasMaxLength(255);
             builder.Property(m => m.ArchStyle)
                    .HasMaxLength(100);
             builder.Property(m => m.DateOfRecord)

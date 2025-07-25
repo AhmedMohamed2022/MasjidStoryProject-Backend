@@ -16,5 +16,6 @@ namespace Models.Entities
         public virtual Language Language { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string Address { get; set; } // NEW: per-language address
     }
 }
