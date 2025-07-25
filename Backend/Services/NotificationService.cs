@@ -4,6 +4,7 @@ using Models.Entities;
 using Repositories.Interfaces;
 using System.Security.Claims;
 using ViewModels;
+using System.Text.Json;
 
 namespace Services
 {
@@ -20,23 +21,25 @@ namespace Services
 
         public async Task<List<NotificationViewModel>> GetUserNotificationsAsync(string userId)
         {
-            var notifications = await _context.Notifications
+            var notificationEntities = await _context.Notifications
                 .Where(n => n.UserId == userId)
                 .OrderByDescending(n => n.DateCreated)
-                .Select(n => new NotificationViewModel
-                {
-                    Id = n.Id,
-                    UserId = n.UserId,
-                    Title = n.Title,
-                    Message = n.Text,
-                    Type = n.Type,
-                    ContentType = n.ContentType,
-                    ContentId = n.ContentId,
-                    IsRead = n.IsRead,
-                    DateCreated = n.DateCreated,
-                    SenderName = n.SenderName
-                })
                 .ToListAsync();
+
+            var notifications = notificationEntities.Select(n => new NotificationViewModel
+            {
+                Id = n.Id,
+                UserId = n.UserId,
+                Title = n.Title,
+                MessageKey = n.MessageKey,
+                MessageVariables = n.MessageVariables != null ? JsonSerializer.Deserialize<Dictionary<string, string>>(n.MessageVariables) : null,
+                Type = n.Type,
+                ContentType = n.ContentType,
+                ContentId = n.ContentId,
+                IsRead = n.IsRead,
+                DateCreated = n.DateCreated,
+                SenderName = n.SenderName
+            }).ToList();
 
             return notifications;
         }
@@ -93,7 +96,8 @@ namespace Services
             {
                 UserId = model.UserId,
                 Title = model.Title,
-                Text = model.Message,
+                MessageKey = model.MessageKey,
+                MessageVariables = model.MessageVariables != null ? JsonSerializer.Serialize(model.MessageVariables) : null,
                 Type = model.Type,
                 ContentType = model.ContentType,
                 ContentId = model.ContentId,
@@ -110,7 +114,8 @@ namespace Services
                 Id = notification.Id,
                 UserId = notification.UserId,
                 Title = notification.Title,
-                Message = notification.Text,
+                MessageKey = notification.MessageKey,
+                MessageVariables = notification.MessageVariables != null ? JsonSerializer.Deserialize<Dictionary<string, string>>(notification.MessageVariables) : null,
                 Type = notification.Type,
                 ContentType = notification.ContentType,
                 ContentId = notification.ContentId,
@@ -123,11 +128,17 @@ namespace Services
         // Helper method to create notifications for likes
         public async Task CreateLikeNotificationAsync(int contentId, string contentType, string contentOwnerId, string likerName)
         {
+            var variables = new Dictionary<string, string>
+            {
+                { "user", likerName },
+                { "contentType", contentType.ToLower() }
+            };
             var notification = new Notification
             {
                 UserId = contentOwnerId,
                 Title = "New Like",
-                Text = $"{likerName} liked your {contentType.ToLower()}",
+                MessageKey = "NOTIFICATION.LIKE",
+                MessageVariables = JsonSerializer.Serialize(variables),
                 Type = "Like",
                 ContentType = contentType,
                 ContentId = contentId,
@@ -135,7 +146,6 @@ namespace Services
                 DateCreated = DateTime.UtcNow,
                 SenderName = likerName
             };
-
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
         }
@@ -143,11 +153,17 @@ namespace Services
         // Helper method to create notifications for comments
         public async Task CreateCommentNotificationAsync(int contentId, string contentType, string contentOwnerId, string commenterName)
         {
+            var variables = new Dictionary<string, string>
+            {
+                { "user", commenterName },
+                { "contentType", contentType.ToLower() }
+            };
             var notification = new Notification
             {
                 UserId = contentOwnerId,
                 Title = "New Comment",
-                Text = $"{commenterName} commented on your {contentType.ToLower()}",
+                MessageKey = "NOTIFICATION.COMMENT",
+                MessageVariables = JsonSerializer.Serialize(variables),
                 Type = "Comment",
                 ContentType = contentType,
                 ContentId = contentId,
@@ -155,19 +171,19 @@ namespace Services
                 DateCreated = DateTime.UtcNow,
                 SenderName = commenterName
             };
-
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
         }
 
         // Helper method to create approval notifications
-        public async Task CreateApprovalNotificationAsync(string userId, string title, string message, string contentType, int? contentId = null)
+        public async Task CreateApprovalNotificationAsync(string userId, string title, string messageKey, Dictionary<string, string> variables, string contentType, int? contentId = null)
         {
             var notification = new Notification
             {
                 UserId = userId,
                 Title = title,
-                Text = message,
+                MessageKey = messageKey,
+                MessageVariables = variables != null ? JsonSerializer.Serialize(variables) : null,
                 Type = "Approval",
                 ContentType = contentType,
                 ContentId = contentId,
@@ -175,7 +191,6 @@ namespace Services
                 DateCreated = DateTime.UtcNow,
                 SenderName = "System"
             };
-
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
         }

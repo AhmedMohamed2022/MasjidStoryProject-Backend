@@ -131,7 +131,11 @@ namespace Services
                     {
                         UserId = adminUser.Id,
                         Title = "New Story Pending Approval",
-                        Message = $"A new story '{storyTitle}' by {author} is waiting for your approval.",
+                        MessageKey = "NOTIFICATION.NEW_STORY_PENDING",
+                        MessageVariables = new Dictionary<string, string> {
+                            { "storyTitle", storyTitle },
+                            { "author", author ?? "Unknown User" }
+                        },
                         Type = "Approval",
                         ContentType = "Story",
                         ContentId = storyId,
@@ -162,7 +166,10 @@ namespace Services
                     {
                         UserId = story.ApplicationUserId,
                         Title = "Story Approved",
-                        Message = $"Your story '{firstTitle}' has been approved and is now live!",
+                        MessageKey = "NOTIFICATION.APPROVAL",
+                        MessageVariables = new Dictionary<string, string> {
+                            { "contentType", firstTitle }
+                        },
                         Type = "Approval",
                         ContentType = "Story",
                         ContentId = storyId,

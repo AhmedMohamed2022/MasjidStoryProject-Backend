@@ -21,9 +21,12 @@ namespace Models.Configurations
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(n => n.Text)
+            builder.Property(n => n.MessageKey)
                 .IsRequired()
-                .HasMaxLength(1000);
+                .HasMaxLength(200);
+
+            builder.Property(n => n.MessageVariables)
+                .HasMaxLength(2000);
 
             builder.Property(n => n.Type)
                 .IsRequired()

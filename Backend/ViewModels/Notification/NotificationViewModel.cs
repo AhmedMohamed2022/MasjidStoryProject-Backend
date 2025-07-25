@@ -12,7 +12,8 @@ namespace ViewModels
         public int Id { get; set; }
         public string UserId { get; set; }
         public string Title { get; set; }
-        public string Message { get; set; }
+        public string MessageKey { get; set; } // e.g., NOTIFICATION.LIKE
+        public Dictionary<string, string> MessageVariables { get; set; } // variables for interpolation
         public string Type { get; set; } // "Like", "Comment", "Approval", "General"
         public string ContentType { get; set; } // "Story", "Event", "Community"
         public int? ContentId { get; set; }
@@ -25,7 +26,8 @@ namespace ViewModels
     {
         public string UserId { get; set; }
         public string Title { get; set; }
-        public string Message { get; set; }
+        public string MessageKey { get; set; }
+        public Dictionary<string, string> MessageVariables { get; set; }
         public string Type { get; set; }
         public string ContentType { get; set; }
         public int? ContentId { get; set; }

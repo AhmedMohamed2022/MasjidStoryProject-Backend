@@ -97,6 +97,11 @@ namespace MasjidStory.Controllers
             }
             catch (Exception ex)
             {
+                // Check for file size limit exceeded
+                if (ex is BadHttpRequestException && ex.Message.Contains("Request body too large"))
+                {
+                    return BadRequest(ApiResponse<string>.Fail("The total size of uploaded images exceeds the 10MB limit. Please reduce the size or number of images and try again."));
+                }
                 return BadRequest(ApiResponse<string>.Fail($"Failed to submit a story: {ex.Message}"));
             }
         }

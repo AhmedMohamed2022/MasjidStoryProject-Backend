@@ -14,7 +14,8 @@ namespace Models.Entities
         public string UserId { get; set; }
         public virtual ApplicationUser User { get; set; }
         public string Title { get; set; }
-        public string Text { get; set; }
+        public string MessageKey { get; set; } // e.g., NOTIFICATION.LIKE
+        public string MessageVariables { get; set; } // JSON string of variables for interpolation
         public string Type { get; set; }
         public string ContentType { get; set; }
         public int? ContentId { get; set; }

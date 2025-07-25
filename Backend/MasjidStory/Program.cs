@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Repositories;
 using ViewModels;
+using MasjidStory.Services;
 
 namespace MasjidStory
 {
@@ -48,6 +49,8 @@ namespace MasjidStory
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<MasjidService>();
             builder.Services.AddScoped<StoryService>();
+            // Ensure ImageService is registered before MediaService for DI
+            builder.Services.AddScoped<ImageService>();
             builder.Services.AddScoped<MediaService>();
             builder.Services.AddScoped<EventService>();
             builder.Services.AddScoped<LikeService>();
