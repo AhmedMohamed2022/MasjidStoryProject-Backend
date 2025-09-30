@@ -14,10 +14,7 @@ namespace Repositories.Interfaces
     /// </summary>
     public interface ILikeRepository
     {
-        //Task<List<LikeViewModel>> GetAllAsync();
-        //Task<LikeViewModel?> GetByIdAsync(int id);
-        //Task AddAsync(LikeCreateViewModel model);
-        //Task<bool> DeleteAsync(int id);
+        
         Task<bool> ToggleLikeAsync(int contentId, string contentType, string userId);
         Task<int> GetLikeCountAsync(int contentId, string contentType);
         Task<bool> IsLikedByUserAsync(int contentId, string contentType, string userId);

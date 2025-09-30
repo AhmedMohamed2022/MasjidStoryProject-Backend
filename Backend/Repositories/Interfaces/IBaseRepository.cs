@@ -11,8 +11,7 @@ namespace Repositories.Interfaces
 
     public interface IBaseRepository<T> where T : class
     {
-        //Task<T> GetByIdAsync(object id);
-        //Task<IEnumerable<T>> GetAllAsync();
+        
         // get  by Id of any type
         Task<T> GetByIdAsync<TKey>(TKey id);
         // Get all entities with optional includes and filters

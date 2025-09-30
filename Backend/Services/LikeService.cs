@@ -115,12 +115,5 @@ namespace Services
             return user != null ? $"{user.FirstName} {user.LastName}" : "Unknown User";
         }
 
-        ///// <summary>
-        ///// Deletes a like by ID
-        ///// </summary>
-        //public async Task<bool> DeleteLikeAsync(int id)
-        //{
-        //    return await _likeRepository.DeleteAsync(id);
-        //}
     }
 } 

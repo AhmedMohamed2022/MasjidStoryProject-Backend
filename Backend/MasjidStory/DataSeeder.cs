@@ -35,20 +35,19 @@ namespace MasjidStory
         public static async Task SeedAdminUserAsync(IServiceProvider services)
         {
             var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-            var adminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
-            var adminPassword = Environment.GetEnvironmentVariable("ADMIN_PASSWORD");
-            var firstName = Environment.GetEnvironmentVariable("ADMIN_FIRST_NAME") ?? "Super";
-            var lastName = Environment.GetEnvironmentVariable("ADMIN_LAST_NAME") ?? "Admin";
+            var config = services.GetRequiredService<IConfiguration>();
+            var adminEmail = config["AdminUser:Email"];
+            var adminPassword = config["AdminUser:Password"];
+            var firstName = config["AdminUser:FirstName"] ?? "Super";
+            var lastName = config["AdminUser:LastName"] ?? "Admin";
+
 
             if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
             {
-                Console.WriteLine("⚠ Admin credentials are missing from environment variables");
-                Console.WriteLine("Please set the following environment variables:");
-                Console.WriteLine("  ADMIN_EMAIL=admin@masjidstory.com");
-                Console.WriteLine("  ADMIN_PASSWORD=SuperSecret123!");
-                Console.WriteLine("  JWT_KEY=your-super-secret-jwt-key-here-minimum-32-characters");
+                Console.WriteLine("⚠ Admin credentials are missing from appsettings.json");
                 return;
             }
+
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null)
             {

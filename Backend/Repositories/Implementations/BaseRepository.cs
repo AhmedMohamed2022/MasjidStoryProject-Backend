@@ -32,11 +32,7 @@ namespace Repositories.Implementations
             return await _dbSet.FirstOrDefaultAsync(e => EF.Property<TKey>(e, "Id")!.Equals(id));
         }
         // returns only the first matched entity (not a list).
-        /*
-         * var userWithRoles = await _userRepo.GetFirstOrDefaultAsync(
-           u => u.UserName == "ahmed", 
-        u => u.Roles, u => u.Notifications);
-         */
+      
         public async Task<T> GetFirstOrDefaultAsync(
         Expression<Func<T, bool>> filter,
         params Expression<Func<T, object>>[] includes)

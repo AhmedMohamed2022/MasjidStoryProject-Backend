@@ -16,10 +16,6 @@ namespace Models.Configurations
             {
                 builder.ToTable("Countries");
                 builder.HasKey(c => c.Id);
-                // Remove Name property config
-                // builder.Property(c => c.Name)
-                //        .IsRequired()
-                //        .HasMaxLength(100);
                 // Relationships
                 builder.HasMany(c => c.Contents)
                        .WithOne(cc => cc.Country)

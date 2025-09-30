@@ -29,7 +29,7 @@ namespace MasjidStory
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseLazyLoadingProxies().UseSqlServer(
-                    Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING") ?? 
+                    //Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING") ?? 
                     builder.Configuration.GetConnectionString("DefaultConnection")
                 ));
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -74,12 +74,13 @@ namespace MasjidStory
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "MasjidStoryApp",
-                    ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "MasjidStoryUsers",
+                    ValidIssuer = builder.Configuration["JWT:Issuer"],
+                    ValidAudience = builder.Configuration["JWT:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_KEY") ?? throw new InvalidOperationException("JWT_KEY environment variable is required")))
+                        Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"] ?? throw new InvalidOperationException("JWT Key is missing.")))
                 };
             });
+
 
 
 
@@ -102,68 +103,7 @@ namespace MasjidStory
                                     .AllowAnyHeader()
                                     .AllowCredentials());
             });
-            //builder.Services.AddAuthentication(options =>
-            //{
-            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //});
-            //builder.Services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("RequireAuthenticatedUser", policy =>
-            //        policy.RequireAuthenticatedUser());
-            //});
-            //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(options =>
-            //    {
-            //        options.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateIssuer = true,
-            //            ValidateAudience = true,
-            //            ValidateLifetime = true,
-            //            ValidateIssuerSigningKey = true,
-            //            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            //            ValidAudience = builder.Configuration["Jwt:Audience"],
-            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-            //        };
-            //    });
-            //builder.Services.AddAuthorization(options =>
-            //{
-            //    options.AddPolicy("AdminOnly", policy =>
-            //        policy.RequireRole("Admin"));
-            //    options.AddPolicy("UserOnly", policy =>
-            //        policy.RequireRole("User"));
-            //});
-            //builder.Services.AddCors(options =>
-            //{
-            //    options.AddPolicy("AllowAllOrigins",
-            //        builder => builder.AllowAnyOrigin()
-            //                          .AllowAnyMethod()
-            //                          .AllowAnyHeader());
-            //});
-            //builder.Services.AddControllersWithViews()
-            //    .AddNewtonsoftJson(options =>
-            //        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-            //builder.Services.AddRazorPages();
-
-            //builder.Services.AddSwaggerGen(c =>
-            //{
-            //    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "MasjidStory API", Version = "v1" });
-            //    c.EnableAnnotations();
-            //});
-            //builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(options =>
-            //    {
-            //        options.TokenValidationParameters = new TokenValidationParameters
-            //        {
-            //            ValidateIssuer = true,
-            //            ValidateAudience = true,
-            //            ValidateLifetime = true,
-            //            ValidateIssuerSigningKey = true,
-            //            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            //            ValidAudience = builder.Configuration["Jwt:Audience"],
-            //            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-            //        };
-            //    });
+          
 
 
             var app = builder.Build();

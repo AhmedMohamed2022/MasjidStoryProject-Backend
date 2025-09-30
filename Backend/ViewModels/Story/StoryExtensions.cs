@@ -113,25 +113,10 @@ namespace ViewModels
                     });
                 }
             }
-            // Add audit trail information (you might want to add these fields to the Story entity)
-            // entity.LastModified = DateTime.UtcNow;
-            // entity.RequiresReapproval = model.RequiresReapproval;
-            // entity.ChangeReason = model.ChangeReason;
+            
         }
 
-        //public static StoryEditViewModel ToEditViewModel(this Story entity)
-        //{
-        //    return new StoryEditViewModel
-        //    {
-        //        Id = entity.Id,
-        //        Title = entity.Title,
-        //        Content = entity.Content,
-        //        MasjidId = entity.MasjidId,
-        //        LanguageId = entity.LanguageId,
-        //        IsApproved = entity.IsApproved,
-        //        ExistingImageUrls = entity.MediaItems?.Select(m => m.FileUrl).ToList() ?? new()
-        //    };
-        //}
+       
     }
 
 }

@@ -11,8 +11,6 @@ namespace ViewModels
             {
                 Id = media.Id,
                 FileUrl = media.FileUrl,
-                //FileName = media.FileName,
-                //FileSize = media.FileSize,
                 ContentType = media.MediaType,
                 MasjidId = media.MasjidId,
                 StoryId = media.StoryId,

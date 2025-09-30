@@ -11,10 +11,8 @@ namespace Repositories.Interfaces
     {
         Task<List<StoryViewModel>> GetAllAsync(string languageCode = "en");
         Task<StoryViewModel?> GetByIdAsync(int id, string? currentUserId = null, string languageCode = "en");
-        //Task<StoryEditViewModel?> GetEditByIdAsync(int id);
         Task<bool> UpdateAsync(StoryEditViewModel model);
         Task<bool> DeleteAsync(int id);
-        //Task AddStoryAsync(StoryCreateViewModel model, string userId, List<string> imageUrls);
         Task<int> AddStoryAsync(StoryCreateViewModel model,string userId);
         Task<List<StoryViewModel>> GetPendingAsync(string languageCode = "en");
         Task<bool> ApproveAsync(int id);
